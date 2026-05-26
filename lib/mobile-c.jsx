@@ -48,6 +48,9 @@ function MobileC({ start = 'home' }) {
     <PhoneBezel paper={T.bg}>
       {screens[current.view]}
       {isTab && <TabBar active={tabId} onChange={goTab}/>}
+      {isTab && (
+        <AiChatFab onClick={() => push('ai-chat')} hasTabBar={true}/>
+      )}
       {storePickerOpen && (
         <StorePicker current={store} onPick={(s) => { setStore(s); setStorePickerOpen(false); }} onClose={() => setStorePickerOpen(false)}/>
       )}

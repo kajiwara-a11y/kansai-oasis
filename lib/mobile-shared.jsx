@@ -128,6 +128,27 @@ function TabBar({ active, onChange, accent = T.orange }) {
   );
 }
 
+// ── Circular AI chatbot FAB — sits bottom-right on tab screens ───
+function AiChatFab({ onClick, hasTabBar = true }) {
+  const bottom = (hasTabBar ? SAFE_BOT : 0) + 18;
+  return (
+    <button onClick={onClick} aria-label="OASIS アシスタントに相談" style={{
+      position: 'absolute', right: 16, bottom, zIndex: 35,
+      width: 56, height: 56, borderRadius: 999,
+      background: `linear-gradient(135deg, ${T.orange}, ${T.orangeDeep})`,
+      color: '#fff', border: 0, cursor: 'pointer',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: '0 12px 28px rgba(46,133,64,.45), 0 0 0 2px rgba(255,255,255,.95)',
+      transition: 'transform .15s ease',
+    }}
+    onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(.92)'; }}
+    onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}>
+      <Icon name="sparkleF" size={26} color="#fff"/>
+    </button>
+  );
+}
+
 // ── Floating AI button (used on home variants) ───────────────────
 function AiFab({ onClick, label = 'AIに相談', tone = 'orange', style }) {
   const bg = tone === 'dark' ? T.brand : T.orange;
@@ -228,6 +249,6 @@ function HeroBanner({ tone = 'fresh', kicker, title, sub, badge, kind = 'cabbage
 
 Object.assign(window, {
   SAFE_TOP, SAFE_BOT,
-  PhoneBezel, TopBar, BrandHeader, TabBar, AiFab,
+  PhoneBezel, TopBar, BrandHeader, TabBar, AiFab, AiChatFab,
   ProductCard, HeroBanner, iconBtn,
 });
