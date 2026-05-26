@@ -411,11 +411,16 @@ function C_AisleMap({ pop, push }) {
     { aisle: '日配',  it: '卵 + 豆腐',       dist: '58m', pos: { x: 30, y: 110 } },
     { aisle: '鮮魚',  it: '銀鮭',            dist: '92m', pos: { x: 230, y: 35 } },
   ];
-  const cur = steps[step];
-  const isLast = step === steps.length - 1;
+  const cur = steps[step] || steps[steps.length - 1];
+  const isLast = step >= steps.length - 1;
   const advance = () => {
-    if (isLast) setDone(true);
-    else setStep(s => s + 1);
+    setStep(s => {
+      if (s >= steps.length - 1) {
+        Promise.resolve().then(() => setDone(true));
+        return s;
+      }
+      return s + 1;
+    });
   };
   return (
     <div style={{ height: '100%', background: T.bg, display: 'flex', flexDirection: 'column' }}>
