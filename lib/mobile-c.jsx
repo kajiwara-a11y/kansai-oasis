@@ -157,66 +157,168 @@ function C_Home({ push, store, onStore }) {
   const total = listItems.reduce((s, i) => s + i.price, 0);
   const done = listItems.filter(i => i.done).length;
 
+  // ── Hero cards: AI proposals + campaign banners (horizontal scroll)
+  const heroCards = [
+    {
+      kind: 'ai', kicker: 'YOUR AI ASSISTANT', meta: '17:24 · 神戸三宮店から',
+      titleNode: <>こんばんは、田中さん。<br/>今夜は <span style={{ color: T.orange }}>親子丼</span> はいかがですか？</>,
+      subNode: <>鶏もも肉と卵が特売中。15分で作れて、家族 4 人分で <span style={{ color: T.orange, fontWeight: 800 }}>¥1,180</span> です。</>,
+      ctaLabel: 'レシピを見る', onCta: () => push('recipe-detail', { id: 'oyakodon' }),
+      altLabel: '別の案', onAlt: () => push('ai-chat'),
+    },
+    {
+      kind: 'ai', kicker: 'AI · 時短メニュー', meta: '10 分 · 4人前 ¥1,200',
+      titleNode: <>北海道銀鮭の<br/><span style={{ color: T.orange }}>塩焼き定食</span></>,
+      subNode: <>銀鮭 2切 <span style={{ color: T.orange, fontWeight: 800 }}>¥498</span> (−28%)。味噌汁・キャベツの千切りと一緒に。</>,
+      ctaLabel: 'レシピを見る', onCta: () => push('ai-chat'),
+      altLabel: '別の案', onAlt: () => push('ai-chat'),
+    },
+    {
+      kind: 'campaign', badge: 'CAMPAIGN', icon: 'gift',
+      bg: 'linear-gradient(135deg, #1e5180 0%, #2a6ba8 100%)', accent: '#a8d2f0',
+      titleNode: <>北海道フェア<br/>開催中</>,
+      subNode: <>銀鮭・牛乳・ベーカリー・乳製品 80 品目が <strong style={{ color: '#ffd86a' }}>最大 30% OFF</strong>。11/26 まで。</>,
+      ctaLabel: 'チラシを見る', onCta: () => push('flyer'),
+    },
+    {
+      kind: 'ai', kicker: 'AI · 子ども向け', meta: '小学生に人気',
+      titleNode: <>三色丼 + メロンパン<br/><span style={{ color: T.orange }}>お子様セット</span></>,
+      subNode: <>三色丼 ¥540 + メロンパン ¥158(17:00 焼上り) + 牛乳 ¥198 で <span style={{ color: T.orange, fontWeight: 800 }}>¥896</span>。</>,
+      ctaLabel: 'リストに追加', onCta: () => push('shopping-list'),
+      altLabel: '別の案', onAlt: () => push('ai-chat'),
+    },
+    {
+      kind: 'campaign', badge: 'TIME SALE', icon: 'flame',
+      bg: `linear-gradient(135deg, ${T.sale} 0%, #a8161c 100%)`, accent: '#ffd86a',
+      titleNode: <>お惣菜タイムセール<br/>17:00 開始</>,
+      subNode: <>本日 17:00 以降 お惣菜・お弁当・寿司が <strong style={{ color: '#ffd86a' }}>最大 20% OFF</strong>。</>,
+      ctaLabel: 'お惣菜を見る', onCta: () => push('flyer'),
+    },
+    {
+      kind: 'campaign', badge: 'POINT BOOST', icon: 'point',
+      bg: 'linear-gradient(135deg, #6b0b14 0%, #8a1521 100%)', accent: '#fde2ec',
+      titleNode: <>S ポイント<br/><span style={{ color: '#ffd86a' }}>4 倍デー</span></>,
+      subNode: <>毎週 水・土・日 · クラブ・エフカード/litta お支払いで実質 4 倍ポイント。</>,
+      ctaLabel: '詳細を見る', onCta: () => push('mypage'),
+    },
+  ];
+  const [heroIdx, setHeroIdx] = React.useState(0);
+  const heroRef = React.useRef(null);
+  const onHeroScroll = (e) => {
+    const w = e.currentTarget.clientWidth - 32 + 12; // card width + gap
+    const idx = Math.round(e.currentTarget.scrollLeft / w);
+    if (idx !== heroIdx) setHeroIdx(Math.max(0, Math.min(heroCards.length - 1, idx)));
+  };
+
   return (
     <div style={{ height: '100%', overflowY: 'auto', background: T.bg, paddingBottom: SAFE_BOT + 30 }} className="oas-noscroll">
       <BrandHeader store={store} onSearch={() => push('search')} onNotif={() => push('notif')} onStore={onStore}/>
       <div style={{ height: SAFE_TOP + 60 }}/>
 
-      {/* AI HERO */}
-      <div style={{ padding: '16px 16px 0' }}>
-        <div style={{
-          background: `linear-gradient(160deg, ${T.brand} 0%, #2a2520 100%)`,
-          borderRadius: 16, padding: '18px 18px 18px',
-          color: '#fff', position: 'relative', overflow: 'hidden',
-        }}>
-          <div style={{
-            position: 'absolute', top: -40, right: -40, width: 180, height: 180,
-            background: `radial-gradient(circle, ${T.orange} 0%, transparent 60%)`,
-            opacity: .25,
-          }}/>
+      {/* AI HERO — horizontal swipeable carousel */}
+      <div style={{ paddingTop: 16 }}>
+        <div ref={heroRef} onScroll={onHeroScroll} style={{
+          display: 'flex', overflowX: 'auto', gap: 12,
+          padding: '0 16px',
+          scrollSnapType: 'x mandatory',
+          scrollPaddingLeft: 16,
+        }} className="oas-noscroll">
+          {heroCards.map((card, i) => {
+            const isAi = card.kind === 'ai';
+            const bg = isAi ? `linear-gradient(160deg, ${T.brand} 0%, #2a2520 100%)` : card.bg;
+            const accent = isAi ? T.orange : card.accent;
+            return (
+              <div key={i} style={{
+                flex: '0 0 calc(100% - 32px)',
+                scrollSnapAlign: 'start',
+                background: bg,
+                borderRadius: 16, padding: 18,
+                color: '#fff', position: 'relative', overflow: 'hidden',
+                minHeight: 188,
+                display: 'flex', flexDirection: 'column',
+              }}>
+                {/* Decorative glow */}
+                <div style={{
+                  position: 'absolute', top: -40, right: -40, width: 180, height: 180,
+                  background: `radial-gradient(circle, ${accent} 0%, transparent 60%)`,
+                  opacity: isAi ? .25 : .35,
+                }}/>
 
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 999, background: T.orange,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(46,133,64,.45)',
-            }}>
-              <Icon name="sparkleF" size={16} color="#fff"/>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: SANS, fontSize: 9.5, fontWeight: 700, color: T.orange, letterSpacing: '.2em' }}>YOUR AI ASSISTANT</div>
-              <div style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,.6)', marginTop: 1 }}>17:24 · 神戸三宮店から</div>
-            </div>
-          </div>
+                {/* Header */}
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                  {isAi ? (
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 999, background: T.orange,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: '0 4px 12px rgba(46,133,64,.45)',
+                    }}>
+                      <Icon name="sparkleF" size={16} color="#fff"/>
+                    </div>
+                  ) : (
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,.18)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Icon name={card.icon} size={16} color="#fff"/>
+                    </div>
+                  )}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: SANS, fontSize: 9.5, fontWeight: 700, color: accent, letterSpacing: '.2em' }}>
+                      {isAi ? card.kicker : card.badge}
+                    </div>
+                    {isAi && card.meta && (
+                      <div style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,.6)', marginTop: 1 }}>{card.meta}</div>
+                    )}
+                  </div>
+                </div>
 
-          <div style={{
-            position: 'relative',
-            fontFamily: SANS, fontWeight: 800, fontSize: 18, lineHeight: 1.45, letterSpacing: '.02em',
-          }}>
-            こんばんは、田中さん。<br/>
-            今夜は <span style={{ color: T.orange }}>親子丼</span> はいかがですか？
-          </div>
-          <div style={{
-            position: 'relative',
-            marginTop: 8, fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,.7)', lineHeight: 1.6,
-          }}>
-            鶏もも肉と卵が特売中。15分で作れて、家族 4 人分で <span style={{ color: T.orange, fontWeight: 800 }}>¥1,180</span> です。
-          </div>
+                {/* Title */}
+                <div style={{
+                  position: 'relative',
+                  fontFamily: SANS, fontWeight: 800, fontSize: 18, lineHeight: 1.4, letterSpacing: '.02em',
+                }}>
+                  {card.titleNode}
+                </div>
 
-          <div style={{ position: 'relative', marginTop: 14, display: 'flex', gap: 8 }}>
-            <button onClick={() => push('recipe-detail', { id: 'oyakodon' })} style={{
-              flex: 1, background: T.orange, color: '#fff', border: 0, cursor: 'pointer',
-              padding: '12px 0', borderRadius: 8,
-              fontFamily: SANS, fontWeight: 800, fontSize: 12.5, letterSpacing: '.05em',
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-            }}>レシピを見る <Icon name="chevR" size={14} color="#fff"/></button>
-            <button onClick={() => push('ai-chat')} style={{
-              background: 'rgba(255,255,255,.12)', color: '#fff', border: 0, cursor: 'pointer',
-              padding: '12px 14px', borderRadius: 8,
-              fontFamily: SANS, fontWeight: 700, fontSize: 12,
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-            }}>別の案</button>
-          </div>
+                {/* Sub */}
+                <div style={{
+                  position: 'relative', flex: 1,
+                  marginTop: 8, fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,.78)', lineHeight: 1.6,
+                }}>
+                  {card.subNode}
+                </div>
+
+                {/* Actions */}
+                <div style={{ position: 'relative', marginTop: 14, display: 'flex', gap: 8 }}>
+                  <button onClick={card.onCta} style={{
+                    flex: 1, background: isAi ? T.orange : 'rgba(255,255,255,.95)',
+                    color: isAi ? '#fff' : '#1a1a1a', border: 0, cursor: 'pointer',
+                    padding: '12px 0', borderRadius: 8,
+                    fontFamily: SANS, fontWeight: 800, fontSize: 12.5, letterSpacing: '.05em',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                  }}>{card.ctaLabel} <Icon name="chevR" size={14} color={isAi ? '#fff' : '#1a1a1a'}/></button>
+                  {card.altLabel && (
+                    <button onClick={card.onAlt} style={{
+                      background: 'rgba(255,255,255,.14)', color: '#fff', border: 0, cursor: 'pointer',
+                      padding: '12px 14px', borderRadius: 8,
+                      fontFamily: SANS, fontWeight: 700, fontSize: 12,
+                    }}>{card.altLabel}</button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Page dots */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}>
+          {heroCards.map((_, i) => (
+            <div key={i} style={{
+              width: i === heroIdx ? 18 : 6, height: 6, borderRadius: 99,
+              background: i === heroIdx ? T.brand : T.outline,
+              transition: 'width .25s, background .25s',
+            }}/>
+          ))}
         </div>
       </div>
 
