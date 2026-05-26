@@ -27,20 +27,6 @@
     display: flex; flex-direction: column; gap: 4px;
   }
   .proto-info b { color: rgba(255,255,255,.9); font-weight: 700; }
-  .proto-links {
-    position: fixed; top: 20px; left: 20px; z-index: 10;
-    display: flex; gap: 8px;
-  }
-  .proto-links a {
-    background: rgba(255,255,255,.08); color: rgba(255,255,255,.7);
-    padding: 8px 14px; border-radius: 999px;
-    text-decoration: none; font-size: 11px; font-weight: 700;
-    letter-spacing: .08em; backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,.1);
-    transition: all .15s;
-  }
-  .proto-links a:hover { background: rgba(255,255,255,.16); color: #fff; }
-  .proto-links a.cur { background: #2e8540; color: #fff; border-color: #2e8540; }
   .proto-resetbtn {
     position: fixed; top: 20px; right: 20px; z-index: 10;
     background: rgba(255,255,255,.08); color: rgba(255,255,255,.7);
@@ -56,11 +42,6 @@
 <body>
 <div class="proto-bg"></div>
 <div id="root"></div>
-
-<div class="proto-links">
-  <a href="App.html">← デザインキャンバスへ戻る</a>
-  <a href="Prototype.html" class="cur">プロトタイプ</a>
-</div>
 
 <button class="proto-resetbtn" onclick="window.__resetProto && window.__resetProto()">ホームへ戻る ⟲</button>
 
