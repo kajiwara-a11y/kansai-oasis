@@ -29,7 +29,7 @@ function MobileC({ start = 'home' }) {
     mypage:         <C_MyPage        push={push}/>,
     product:        <C_Product       data={current.data} pop={pop} push={push}/>,
    'shopping-list': <C_ShoppingList  pop={pop} push={push}/>,
-   'aisle-map':     <C_AisleMap      pop={pop}/>,
+   'aisle-map':     <C_AisleMap      pop={pop} push={push}/>,
    'recipe-detail': <C_RecipeDetail  data={current.data} pop={pop} push={push}/>,
    'ai-chat':       <C_AiChat        pop={pop} push={push}/>,
     search:         <C_Search        pop={pop} push={push}/>,

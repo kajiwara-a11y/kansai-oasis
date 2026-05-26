@@ -402,8 +402,9 @@ function C_ShoppingList({ pop, push }) {
 // ─────────────────────────────────────────────────────────────
 // AISLE MAP / Store nav
 // ─────────────────────────────────────────────────────────────
-function C_AisleMap({ pop }) {
+function C_AisleMap({ pop, push }) {
   const [step, setStep] = React.useState(2);
+  const [done, setDone] = React.useState(false);
   const steps = [
     { aisle: '青果',  it: '玉ねぎ + 三つ葉', dist: '0m',  pos: { x: 30, y: 60 } },
     { aisle: '精肉',  it: '鶏もも肉',        dist: '32m', pos: { x: 130, y: 35 } },
@@ -411,6 +412,11 @@ function C_AisleMap({ pop }) {
     { aisle: '鮮魚',  it: '銀鮭',            dist: '92m', pos: { x: 230, y: 35 } },
   ];
   const cur = steps[step];
+  const isLast = step === steps.length - 1;
+  const advance = () => {
+    if (isLast) setDone(true);
+    else setStep(s => s + 1);
+  };
   return (
     <div style={{ height: '100%', background: T.bg, display: 'flex', flexDirection: 'column' }}>
       <C_TopBar leftBack onBack={pop} title="店内ナビ" sub="神戸三宮店 · 約 12 分"/>
@@ -523,18 +529,121 @@ function C_AisleMap({ pop }) {
           cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
           opacity: step > 0 ? 1 : .4,
         }}><Icon name="chevL" size={20} color={T.ink}/></button>
-        <button onClick={() => setStep(s => Math.min(steps.length - 1, s + 1))} style={{
+        <button onClick={advance} style={{
           flex: 1, background: T.orange, color: '#fff', border: 0, cursor: 'pointer',
           padding: '14px 0', borderRadius: 8,
           fontFamily: SANS, fontWeight: 800, fontSize: 13, letterSpacing: '.05em',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        }}><Icon name="check" size={16} color="#fff"/> 商品を取得した</button>
-        <button onClick={() => setStep(s => Math.min(steps.length - 1, s + 1))} style={{
+        }}><Icon name="check" size={16} color="#fff"/> {isLast ? '最後の商品を取得した' : '商品を取得した'}</button>
+        <button onClick={advance} style={{
           width: 48, height: 48, background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 8,
           cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
           opacity: step < steps.length - 1 ? 1 : .4,
         }}><Icon name="chevR" size={20} color={T.ink}/></button>
       </div>
+
+      {done && (
+        <>
+          <div onClick={() => setDone(false)} style={{
+            position: 'absolute', inset: 0, zIndex: 80,
+            background: 'rgba(0,0,0,.5)', animation: 'oasFadeIn .2s',
+          }}/>
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 81,
+            background: '#fff', borderTopLeftRadius: 22, borderTopRightRadius: 22,
+            padding: '12px 0 0', animation: 'oasSlideUp .25s ease-out',
+            boxShadow: '0 -10px 30px rgba(0,0,0,.18)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
+              <div style={{ width: 38, height: 4, background: T.outline, borderRadius: 99 }}/>
+            </div>
+
+            {/* Celebration */}
+            <div style={{ padding: '14px 20px 6px', textAlign: 'center' }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: 999, background: T.orangeSoft,
+                margin: '0 auto 12px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Icon name="check" size={32} color={T.orange} sw={2.6}/>
+              </div>
+              <div style={{ fontFamily: SANS, fontWeight: 900, fontSize: 19, color: T.ink, letterSpacing: '.02em' }}>
+                お買い物完了!
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.inkSoft, marginTop: 4 }}>
+                {steps.length} 売場 すべて回り終えました
+              </div>
+            </div>
+
+            {/* Receipt summary */}
+            <div style={{ padding: '0 20px', marginTop: 8 }}>
+              <div style={{
+                background: T.paperAlt, border: `1px solid ${T.outline}`, borderRadius: 10,
+                padding: '12px 14px',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', fontFamily: SANS, fontSize: 11.5, color: T.inkMid }}>
+                  <span style={{ flex: 1 }}>商品 6 点</span>
+                  <Yen value={952} size={12}/>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: 4, fontFamily: SANS, fontSize: 11.5, color: T.orange, fontWeight: 700 }}>
+                  <span style={{ flex: 1 }}>クーポン適用</span>
+                  <span>− ¥50</span>
+                </div>
+                <div style={{
+                  display: 'flex', alignItems: 'baseline', marginTop: 8,
+                  paddingTop: 8, borderTop: `1px solid ${T.outlineSoft}`,
+                }}>
+                  <span style={{ flex: 1, fontFamily: SANS, fontSize: 12, color: T.ink, fontWeight: 800 }}>お支払合計</span>
+                  <Yen value={902} size={22} tone="sale"/>
+                </div>
+              </div>
+            </div>
+
+            {/* AI cross-sell */}
+            <div style={{ padding: '12px 20px 0' }}>
+              <div style={{
+                background: T.brand, color: '#fff', borderRadius: 10,
+                padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
+              }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: 999, background: T.orange,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+                }}>
+                  <Icon name="sparkleF" size={13} color="#fff"/>
+                </div>
+                <div style={{ flex: 1, fontFamily: SANS, fontSize: 11, lineHeight: 1.5 }}>
+                  レジ前に <strong style={{ color: T.orange }}>本日限り ¥30 OFF の卵</strong> はいかがですか?
+                </div>
+                <button onClick={() => setDone(false)} style={{
+                  background: T.orange, color: '#fff', border: 0, cursor: 'pointer',
+                  padding: '6px 10px', borderRadius: 6,
+                  fontFamily: SANS, fontWeight: 800, fontSize: 10.5,
+                  flex: '0 0 auto',
+                }}>追加</button>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div style={{ padding: '14px 20px 22px', display: 'flex', gap: 10 }}>
+              <button onClick={() => { setDone(false); pop && pop(); }} style={{
+                flex: '0 0 auto', padding: '12px 14px', background: '#fff',
+                border: `1px solid ${T.outline}`, borderRadius: 8, cursor: 'pointer',
+                fontFamily: SANS, fontWeight: 700, fontSize: 12, color: T.inkMid,
+              }}>リストに戻る</button>
+              <button onClick={() => { setDone(false); push && push('barcode'); }} style={{
+                flex: 1, background: T.orange, color: '#fff', border: 0, cursor: 'pointer',
+                padding: '13px 0', borderRadius: 8,
+                fontFamily: SANS, fontWeight: 800, fontSize: 13, letterSpacing: '.06em',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                boxShadow: '0 4px 12px rgba(46,133,64,.3)',
+              }}>
+                <Icon name="qr" size={16} color="#fff"/>
+                レジへ進む
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
