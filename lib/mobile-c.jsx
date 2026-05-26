@@ -30,12 +30,12 @@ function MobileC({ start = 'home' }) {
    'recipe-detail': <C_RecipeDetail  data={current.data} pop={pop} push={push}/>,
    'ai-chat':       <C_AiChat        pop={pop} push={push}/>,
     search:         <C_Search        pop={pop} push={push}/>,
-    notif:          <C_Notif         pop={pop}/>,
+    notif:          <C_Notif         pop={pop} push={push}/>,
     barcode:        <C_Barcode       pop={pop} push={push}/>,
    'kitchen-yell':  <C_KitchenYell   pop={pop} push={push}/>,
-    contact:        <C_Contact       pop={pop}/>,
+    contact:        <C_Contact       pop={pop} push={push}/>,
     terms:          <C_Terms         pop={pop}/>,
-    settings:       <C_Settings      pop={pop}/>,
+    settings:       <C_Settings      pop={pop} push={push}/>,
     account:        <C_Account       pop={pop}/>,
     orders:         <C_OrderHistory  pop={pop} push={push}/>,
     favorites:      <C_Favorites     pop={pop} push={push}/>,
@@ -65,7 +65,7 @@ function C_Home({ push }) {
 
   return (
     <div style={{ height: '100%', overflowY: 'auto', background: T.bg, paddingBottom: SAFE_BOT + 30 }} className="oas-noscroll">
-      <BrandHeader onSearch={() => push('search')} onNotif={() => push('notif')}/>
+      <BrandHeader onSearch={() => push('search')} onNotif={() => push('notif')} onStore={() => push('account')}/>
       <div style={{ height: SAFE_TOP + 60 }}/>
 
       {/* AI HERO */}

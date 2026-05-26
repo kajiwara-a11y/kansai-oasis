@@ -33,7 +33,7 @@ function C_Field({ label, value, type = 'text', onChange, hint, required }) {
 // ─────────────────────────────────────────────────────────────
 // CONTACT / お問い合わせ
 // ─────────────────────────────────────────────────────────────
-function C_Contact({ pop }) {
+function C_Contact({ pop, push }) {
   const [topic, setTopic] = React.useState('商品について');
   const [name, setName] = React.useState('田中 はるか');
   const [email, setEmail] = React.useState('haruka@example.com');
@@ -45,7 +45,7 @@ function C_Contact({ pop }) {
       <C_TopBar leftBack onBack={pop} title="お問い合わせ" sub="2 営業日以内にご返信"/>
       <div style={{ height: SAFE_TOP + 48 }}/>
 
-      <C_AiHint>
+      <C_AiHint onTap={() => push && push('ai-chat')}>
         よくある質問は <strong>AI アシスタント</strong> でもお答えできます
       </C_AiHint>
 
@@ -173,7 +173,7 @@ function C_Terms({ pop }) {
 // ─────────────────────────────────────────────────────────────
 // SETTINGS / 通知・設定
 // ─────────────────────────────────────────────────────────────
-function C_Settings({ pop }) {
+function C_Settings({ pop, push }) {
   const [notif, setNotif] = React.useState({
     sale: true, coupon: true, ai: true, news: false, push: true,
   });
@@ -271,12 +271,15 @@ function C_Settings({ pop }) {
         <div style={{ fontFamily: SANS, fontSize: 10, color: T.inkSoft, fontWeight: 700, letterSpacing: '.15em', marginBottom: 6 }}>アカウント</div>
         <div style={{ background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 10, overflow: 'hidden' }}>
           {[
-            { l: 'パスワード変更',   c: T.ink },
-            { l: 'メールアドレス変更', c: T.ink },
-            { l: 'ログアウト',       c: T.inkMid },
-            { l: '会員退会',         c: T.sale },
+            { l: 'パスワード変更',   c: T.ink,    go: 'account' },
+            { l: 'メールアドレス変更', c: T.ink,    go: 'account' },
+            { l: 'ログアウト',       c: T.inkMid, go: 'pop' },
+            { l: '会員退会',         c: T.sale,   go: 'contact' },
           ].map((a, i) => (
-            <button key={a.l} style={{
+            <button key={a.l} onClick={() => {
+              if (a.go === 'pop') pop && pop();
+              else if (push) push(a.go);
+            }} style={{
               width: '100%', padding: '14px 14px', textAlign: 'left',
               background: '#fff', border: 0, cursor: 'pointer',
               borderTop: i ? `1px solid ${T.outlineSoft}` : 'none',
@@ -459,7 +462,7 @@ function C_Favorites({ pop, push }) {
         right={<button onClick={() => push('search')} style={iconBtn}><Icon name="search" size={20} color="#fff"/></button>}/>
       <div style={{ height: SAFE_TOP + 48 }}/>
 
-      <C_AiHint>
+      <C_AiHint onTap={() => push && push('ai-chat')}>
         AI が <strong>過去の購入</strong> から、お気に入りに似た新商品をご提案します
       </C_AiHint>
 

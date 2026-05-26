@@ -299,19 +299,19 @@ function C_Search({ pop, push }) {
 // ─────────────────────────────────────────────────────────────
 // NOTIF / お知らせ
 // ─────────────────────────────────────────────────────────────
-function C_Notif({ pop }) {
+function C_Notif({ pop, push }) {
   const [allRead, setAllRead] = React.useState(false);
   const groups = [
     { d: '今日', list: [
-      { t: 17, m: 'タイムセール開始 · お惣菜が最大 20% OFF', tag: '特売', tagTone: 'sale', i: 'flame', ai: true },
-      { t: 9,  m: '田中さんへ · 鶏もも肉が本日のおすすめです', tag: 'AI',  tagTone: 'orange',  i: 'sparkleF', ai: true },
+      { t: 17, m: 'タイムセール開始 · お惣菜が最大 20% OFF', tag: '特売', tagTone: 'sale', i: 'flame', ai: true, go: 'flyer' },
+      { t: 9,  m: '田中さんへ · 鶏もも肉が本日のおすすめです', tag: 'AI',  tagTone: 'orange',  i: 'sparkleF', ai: true, go: 'ai-chat' },
     ]},
     { d: '昨日', list: [
-      { t: '15:30', m: 'クーポン「兵庫朝採卵 ¥50OFF」を獲得しました', tag: 'クーポン', tagTone: 'pointSoft', i: 'coupon' },
-      { t: '11:00', m: '北海道フェア 開催のお知らせ',                  tag: 'イベント', tagTone: 'orangeSoft', i: 'gift' },
+      { t: '15:30', m: 'クーポン「兵庫朝採卵 ¥50OFF」を獲得しました', tag: 'クーポン', tagTone: 'pointSoft', i: 'coupon', go: 'coupon' },
+      { t: '11:00', m: '北海道フェア 開催のお知らせ',                  tag: 'イベント', tagTone: 'orangeSoft', i: 'gift', go: 'flyer' },
     ]},
     { d: '11/24', list: [
-      { t: '18:00', m: '年末年始の営業時間について',                   tag: '重要', tagTone: 'sale', i: 'info' },
+      { t: '18:00', m: '年末年始の営業時間について',                   tag: '重要', tagTone: 'sale', i: 'info', go: 'contact' },
     ]},
   ];
   return (
@@ -326,9 +326,11 @@ function C_Notif({ pop }) {
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 800, color: T.inkSoft, letterSpacing: '.2em', margin: '8px 4px' }}>{g.d}</div>
             <div style={{ background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 12, overflow: 'hidden' }}>
               {g.list.map((n, i) => (
-                <div key={i} style={{
-                  padding: '12px 14px', display: 'flex', gap: 10,
+                <button key={i} onClick={() => n.go && push && push(n.go)} style={{
+                  width: '100%', padding: '12px 14px', display: 'flex', gap: 10,
                   borderTop: i ? `1px solid ${T.outlineSoft}` : 'none',
+                  border: 'none', background: '#fff', cursor: 'pointer',
+                  textAlign: 'left', fontFamily: 'inherit',
                 }}>
                   <div style={{
                     width: 32, height: 32, borderRadius: 999,
@@ -349,7 +351,7 @@ function C_Notif({ pop }) {
                   {i === 0 && g.d === '今日' && <div style={{
                     width: 8, height: 8, borderRadius: 999, background: T.orange, alignSelf: 'flex-start', marginTop: 4,
                   }}/>}
-                </div>
+                </button>
               ))}
             </div>
           </div>

@@ -188,7 +188,7 @@ function C_Flyer({ push }) {
         ]},
       ].map(g => (
         <div key={g.cat} style={{ marginTop: 22 }}>
-          <SectionHead title={g.cat} more={`すべて`}/>
+          <SectionHead title={g.cat} more={`すべて`} onMore={() => push('search')}/>
           <div style={{ padding: '0 16px', display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 10 }}>
             {g.items.map((p, i) => <ProductCard key={i} {...p} badge="特売" badgeTone="sale" onTap={() => push('product', p)}/>)}
           </div>

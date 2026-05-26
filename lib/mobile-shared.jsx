@@ -73,7 +73,7 @@ function TopBar({ title, sub, dark, right, leftBack, onBack }) {
 }
 
 // ── Brand header (logo + utilities) — used on home ───────────────
-function BrandHeader({ store = '神戸三宮店', notif = 2, onSearch, onNotif, onUser }) {
+function BrandHeader({ store = '神戸三宮店', notif = 2, onSearch, onNotif, onUser, onStore }) {
   return (
     <div style={{
       position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50,
@@ -83,14 +83,17 @@ function BrandHeader({ store = '神戸三宮店', notif = 2, onSearch, onNotif, 
         padding: '8px 16px 10px', display: 'flex', alignItems: 'center', gap: 10,
       }}>
         <OasisLogo height={26}/>
-        <div style={{ flex: 1, marginLeft: 6 }}>
+        <button onClick={onStore} style={{
+          flex: 1, marginLeft: 6, background: 'transparent', border: 0, padding: 0,
+          cursor: onStore ? 'pointer' : 'default', textAlign: 'left', fontFamily: 'inherit', color: 'inherit',
+        }}>
           <div style={{ fontFamily: SANS, fontWeight: 500, fontSize: 9, color: 'rgba(255,255,255,.55)', letterSpacing: '.2em' }}>YOUR STORE</div>
           <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12, color: T.bg, marginTop: 1, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <Icon name="pin" size={11} color={T.orange} sw={2}/>
             {store}
             <Icon name="chevD" size={11} color="rgba(255,255,255,.6)"/>
           </div>
-        </div>
+        </button>
         <button onClick={onSearch} style={{ ...iconBtn, color: T.bg }}><Icon name="search" size={20} color="#fff"/></button>
         <button onClick={onNotif} style={{ ...iconBtn, position: 'relative', color: T.bg }}>
           <Icon name="bell" size={20} color="#fff"/>
