@@ -13,11 +13,12 @@ function C_Product({ data, pop, push }) {
   const [fav, setFav] = React.useState(false);
   const [claimed, setClaimed] = React.useState(false);
   return (
-    <div style={{ height: '100%', overflowY: 'auto', background: T.bg }} className="oas-noscroll">
+    <div style={{ height: '100%', background: T.bg, display: 'flex', flexDirection: 'column' }}>
       <C_TopBar leftBack onBack={pop} title={p.name} sub={`商品コード · 4901-2345-67890`}
         right={<button onClick={() => setFav(f => !f)} style={{ ...iconBtn, color: '#fff' }}>
           <Icon name={fav ? 'heartF' : 'heart'} size={20} color={fav ? T.orange : '#fff'}/>
         </button>}/>
+      <div style={{ flex: 1, overflowY: 'auto' }} className="oas-noscroll">
       <div style={{ height: SAFE_TOP + 48 }}/>
 
       {/* Hero image */}
@@ -169,9 +170,9 @@ function C_Product({ data, pop, push }) {
         </div>
       </div>
 
+      </div>
       {/* Bottom CTA */}
       <div style={{
-        position: 'absolute', left: 0, right: 0, bottom: 0,
         padding: '12px 16px 22px', background: '#fff',
         borderTop: `1px solid ${T.outlineSoft}`,
         display: 'flex', alignItems: 'center', gap: 10,
@@ -225,7 +226,8 @@ function C_ShoppingList({ pop, push }) {
   const total = flat.reduce((s, i) => s + i.price, 0);
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', background: T.bg, paddingBottom: 130 }} className="oas-noscroll">
+    <div style={{ height: '100%', background: T.bg, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ flex: 1, overflowY: 'auto' }} className="oas-noscroll">
       <C_TopBar leftBack onBack={pop} title="買い物リスト" sub={`${flat.length} 品 · 神戸三宮店`}
         right={<button onClick={() => push('search')} style={iconBtn}><Icon name="plus" size={22} color="#fff"/></button>}/>
       <div style={{ height: SAFE_TOP + 48 }}/>
@@ -376,9 +378,9 @@ function C_ShoppingList({ pop, push }) {
         </div>
       </div>
 
+      </div>
       {/* Bottom action */}
       <div style={{
-        position: 'absolute', left: 0, right: 0, bottom: 0,
         padding: '12px 16px 22px', background: '#fff',
         borderTop: `1px solid ${T.outlineSoft}`,
         display: 'flex', alignItems: 'center', gap: 10,
@@ -558,9 +560,10 @@ function C_RecipeDetail({ data, pop, push }) {
   ];
   const total = ing.reduce((s, i) => s + i.price, 0);
   return (
-    <div style={{ height: '100%', overflowY: 'auto', background: T.bg, position: 'relative' }} className="oas-noscroll">
+    <div style={{ height: '100%', background: T.bg, display: 'flex', flexDirection: 'column' }}>
       <C_TopBar leftBack onBack={pop} title="親子丼"
         right={<button onClick={() => setRecipeFav(f => !f)} style={{ ...iconBtn, color: '#fff' }}><Icon name={recipeFav ? 'heartF' : 'heart'} size={20} color={recipeFav ? T.orange : '#fff'}/></button>}/>
+      <div style={{ flex: 1, overflowY: 'auto' }} className="oas-noscroll">
       <div style={{ height: SAFE_TOP + 48 }}/>
 
       {/* Hero */}
@@ -571,7 +574,7 @@ function C_RecipeDetail({ data, pop, push }) {
         <FoodMark kind="oyakodon" size={170}/>
       </div>
 
-      <div style={{ padding: '14px 16px 130px' }}>
+      <div style={{ padding: '14px 16px 16px' }}>
         <Pill tone="orange" size="xs">AIおすすめ · 本日の特売を使用</Pill>
         <h1 style={{ fontFamily: SANS, fontWeight: 900, fontSize: 22, lineHeight: 1.2, margin: '8px 0 4px', color: T.ink }}>ふんわり親子丼</h1>
         <p style={{ margin: 0, fontFamily: SANS, fontSize: 12, color: T.inkMid, lineHeight: 1.6 }}>
@@ -669,9 +672,9 @@ function C_RecipeDetail({ data, pop, push }) {
         </div>
       </div>
 
+      </div>
       {/* Bottom CTA */}
       <div style={{
-        position: 'absolute', left: 0, right: 0, bottom: 0,
         padding: '12px 16px 22px', background: '#fff',
         borderTop: `1px solid ${T.outlineSoft}`,
         display: 'flex', alignItems: 'center', gap: 10,
