@@ -9,17 +9,20 @@
 
 function MobileC({ start = 'home' }) {
   const [stack, setStack] = React.useState([{ view: start }]);
+  const [store, setStore] = React.useState('神戸三宮店');
+  const [storePickerOpen, setStorePickerOpen] = React.useState(false);
   const current = stack[stack.length - 1];
 
   const push = (view, data) => setStack(s => [...s, { view, data }]);
   const pop  = ()             => setStack(s => s.length > 1 ? s.slice(0, -1) : s);
   const goTab = (view)        => setStack([{ view }]);
+  const openStorePicker = () => setStorePickerOpen(true);
 
   const isTab = ['home','flyer','coupon','recipe','mypage'].includes(current.view);
   const tabId = isTab ? current.view : 'home';
 
   const screens = {
-    home:           <C_Home          push={push}/>,
+    home:           <C_Home          push={push} store={store} onStore={openStorePicker}/>,
     flyer:          <C_Flyer         push={push}/>,
     coupon:         <C_Coupon        push={push}/>,
     recipe:         <C_RecipeList    push={push}/>,
@@ -45,14 +48,102 @@ function MobileC({ start = 'home' }) {
     <PhoneBezel paper={T.bg}>
       {screens[current.view]}
       {isTab && <TabBar active={tabId} onChange={goTab}/>}
+      {storePickerOpen && (
+        <StorePicker current={store} onPick={(s) => { setStore(s); setStorePickerOpen(false); }} onClose={() => setStorePickerOpen(false)}/>
+      )}
     </PhoneBezel>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// STORE PICKER — bottom sheet for switching stores
+// ─────────────────────────────────────────────────────────────
+function StorePicker({ current, onPick, onClose }) {
+  const stores = [
+    { name: '神戸三宮店',       area: '兵庫',   tag: 'ここから' },
+    { name: '梅田店',           area: '大阪',   tag: '徒歩 3 分' },
+    { name: '芦屋店',           area: '兵庫',   tag: '車で 12 分' },
+    { name: '西宮ガーデンズ店', area: '兵庫',   tag: '車で 18 分' },
+    { name: '千里中央店',       area: '大阪',   tag: '電車 25 分' },
+    { name: '高槻松原店',       area: '大阪',   tag: '電車 38 分' },
+    { name: '京都河原町店',     area: '京都',   tag: '電車 1 時間' },
+    { name: '吹田SST店',        area: '大阪',   tag: 'リニューアル' },
+  ];
+  return (
+    <>
+      <div onClick={onClose} style={{
+        position: 'absolute', inset: 0, zIndex: 80,
+        background: 'rgba(0,0,0,.45)', animation: 'oasFadeIn .2s',
+      }}/>
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 81,
+        background: '#fff', borderTopLeftRadius: 18, borderTopRightRadius: 18,
+        maxHeight: '78%', display: 'flex', flexDirection: 'column',
+        animation: 'oasSlideUp .25s ease-out',
+        boxShadow: '0 -10px 30px rgba(0,0,0,.18)',
+      }}>
+        <div style={{ padding: '10px 0 6px', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 38, height: 4, background: T.outline, borderRadius: 99 }}/>
+        </div>
+        <div style={{
+          padding: '6px 18px 12px',
+          borderBottom: `1px solid ${T.outlineSoft}`,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <Icon name="pin" size={18} color={T.orange}/>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 15, color: T.ink }}>店舗を選択</div>
+            <div style={{ fontFamily: SANS, fontSize: 10.5, color: T.inkSoft, marginTop: 1 }}>クーポン・チラシ・在庫・店内ナビが切替わります</div>
+          </div>
+          <button onClick={onClose} style={{
+            background: T.paperAlt, border: 0, padding: '6px 12px', borderRadius: 99,
+            fontFamily: SANS, fontWeight: 700, fontSize: 11, color: T.inkMid, cursor: 'pointer',
+          }}>閉じる</button>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '4px 0 12px' }} className="oas-noscroll">
+          {stores.map((s) => {
+            const isCur = s.name === current;
+            return (
+              <button key={s.name} onClick={() => onPick(s.name)} style={{
+                width: '100%', textAlign: 'left',
+                background: isCur ? T.orangeSoft : '#fff', border: 0, cursor: 'pointer',
+                padding: '14px 18px',
+                borderTop: `1px solid ${T.outlineSoft}`,
+                display: 'flex', alignItems: 'center', gap: 12, fontFamily: 'inherit',
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 999,
+                  background: isCur ? T.orange : T.paperAlt,
+                  color: isCur ? '#fff' : T.inkMid,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+                }}>
+                  <Icon name="pin" size={16} color={isCur ? '#fff' : T.inkSoft}/>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 13.5, color: T.ink }}>{s.name}</span>
+                    {isCur && <span style={{
+                      fontFamily: SANS, fontWeight: 800, fontSize: 9, color: T.orange,
+                      letterSpacing: '.15em', padding: '2px 6px',
+                      background: '#fff', border: `1px solid ${T.orange}`, borderRadius: 99,
+                    }}>選択中</span>}
+                  </div>
+                  <div style={{ fontFamily: SANS, fontSize: 10.5, color: T.inkSoft, marginTop: 2 }}>{s.area} · {s.tag}</div>
+                </div>
+                {isCur && <Icon name="check" size={18} color={T.orange} sw={2.5}/>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }
 
 // ─────────────────────────────────────────────────────────────
 // HOME — AI-led
 // ─────────────────────────────────────────────────────────────
-function C_Home({ push }) {
+function C_Home({ push, store, onStore }) {
   const [listItems, setListItems] = React.useState([
     { name: '鶏もも肉', sub: '300g',  price: 398, kind: 'chicken', done: false, tag: '特売' },
     { name: '兵庫 朝採卵', sub: '10個', price: 178, kind: 'egg',    done: false, tag: '特売' },
@@ -65,7 +156,7 @@ function C_Home({ push }) {
 
   return (
     <div style={{ height: '100%', overflowY: 'auto', background: T.bg, paddingBottom: SAFE_BOT + 30 }} className="oas-noscroll">
-      <BrandHeader onSearch={() => push('search')} onNotif={() => push('notif')} onStore={() => push('account')}/>
+      <BrandHeader store={store} onSearch={() => push('search')} onNotif={() => push('notif')} onStore={onStore}/>
       <div style={{ height: SAFE_TOP + 60 }}/>
 
       {/* AI HERO */}

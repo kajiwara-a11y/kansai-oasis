@@ -76,6 +76,8 @@ const MONO    = `"JetBrains Mono", ui-monospace, "SF Mono", monospace`;
     .oas-num    { font-variant-numeric: tabular-nums; font-family: ${NUM}; }
     .oas-noscroll::-webkit-scrollbar { display: none; }
     .oas-noscroll { scrollbar-width: none; }
+    @keyframes oasFadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes oasSlideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
   `;
   document.head.appendChild(s);
 })();
