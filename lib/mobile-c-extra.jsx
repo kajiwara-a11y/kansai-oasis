@@ -274,8 +274,8 @@ function C_AiChat({ pop, push }) {
 // ─────────────────────────────────────────────────────────────
 // SEARCH
 // ─────────────────────────────────────────────────────────────
-function C_Search({ pop, push }) {
-  const [q, setQ] = React.useState('');
+function C_Search({ pop, push, data }) {
+  const [q, setQ] = React.useState(data?.q || '');
   const [recent, setRecent] = React.useState(['鶏もも肉', '銀鮭', '親子丼', '北海道牛乳']);
   const trending = [
     { l: '本日の特売', n: 14 },

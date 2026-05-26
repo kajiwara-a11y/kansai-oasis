@@ -32,7 +32,7 @@ function MobileC({ start = 'home' }) {
    'aisle-map':     <C_AisleMap      pop={pop} push={push}/>,
    'recipe-detail': <C_RecipeDetail  data={current.data} pop={pop} push={push}/>,
    'ai-chat':       <C_AiChat        pop={pop} push={push}/>,
-    search:         <C_Search        pop={pop} push={push}/>,
+    search:         <C_Search        data={current.data} pop={pop} push={push}/>,
     notif:          <C_Notif         pop={pop} push={push}/>,
     barcode:        <C_Barcode       pop={pop} push={push}/>,
    'kitchen-yell':  <C_KitchenYell   pop={pop} push={push}/>,
