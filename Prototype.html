@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>阪急OASIS · インタラクティブ プロトタイプ</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #1a1715; overflow: hidden; font-family: 'Noto Sans JP', -apple-system, system-ui, sans-serif; }
+  #root { width: 100vw; height: 100vh; }
+  .proto-bg {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at center top, rgba(46,133,64,.08) 0%, transparent 50%),
+      radial-gradient(ellipse at center bottom, rgba(40,30,10,.5) 0%, transparent 60%),
+      #1a1715;
+  }
+  .proto-stage {
+    position: relative; z-index: 1;
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .proto-info {
+    position: fixed; left: 20px; bottom: 20px; z-index: 10;
+    color: rgba(255,255,255,.6);
+    font-size: 11px; letter-spacing: .12em;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .proto-info b { color: rgba(255,255,255,.9); font-weight: 700; }
+  .proto-links {
+    position: fixed; top: 20px; left: 20px; z-index: 10;
+    display: flex; gap: 8px;
+  }
+  .proto-links a {
+    background: rgba(255,255,255,.08); color: rgba(255,255,255,.7);
+    padding: 8px 14px; border-radius: 999px;
+    text-decoration: none; font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.1);
+    transition: all .15s;
+  }
+  .proto-links a:hover { background: rgba(255,255,255,.16); color: #fff; }
+  .proto-links a.cur { background: #2e8540; color: #fff; border-color: #2e8540; }
+  .proto-resetbtn {
+    position: fixed; top: 20px; right: 20px; z-index: 10;
+    background: rgba(255,255,255,.08); color: rgba(255,255,255,.7);
+    border: 1px solid rgba(255,255,255,.1);
+    padding: 8px 14px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    cursor: pointer; backdrop-filter: blur(8px);
+    font-family: inherit;
+  }
+  .proto-resetbtn:hover { background: rgba(255,255,255,.16); color: #fff; }
+</style>
+</head>
+<body>
+<div class="proto-bg"></div>
+<div id="root"></div>
+
+<div class="proto-links">
+  <a href="App.html">← デザインキャンバスへ戻る</a>
+  <a href="Prototype.html" class="cur">プロトタイプ</a>
+</div>
+
+<button class="proto-resetbtn" onclick="window.__resetProto && window.__resetProto()">ホームへ戻る ⟲</button>
+
+<div class="proto-info">
+  <b>阪急OASIS · AI 先導型</b>
+  <span>すべてのボタンが動作します — タブ・カード・アイコンを操作してください</span>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="lib/theme.jsx"></script>
+<script type="text/babel" src="lib/mobile-shared.jsx"></script>
+<script type="text/babel" src="lib/mobile-overlays.jsx"></script>
+<script type="text/babel" src="lib/mobile-c-tabs.jsx"></script>
+<script type="text/babel" src="lib/mobile-c-detail.jsx"></script>
+<script type="text/babel" src="lib/mobile-c-extra.jsx"></script>
+<script type="text/babel" src="lib/mobile-c-misc.jsx"></script>
+<script type="text/babel" src="lib/mobile-c.jsx"></script>
+
+<script type="text/babel">
+function Prototype() {
+  const [resetKey, setResetKey] = React.useState(0);
+  const [scale, setScale] = React.useState(1);
+
+  React.useEffect(() => {
+    const fit = () => {
+      const padding = 80;
+      const sx = (window.innerWidth - padding * 2) / 390;
+      const sy = (window.innerHeight - padding) / 844;
+      setScale(Math.min(sx, sy, 1.15));
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    window.__resetProto = () => setResetKey(k => k + 1);
+    return () => window.removeEventListener('resize', fit);
+  }, []);
+
+  return (
+    <div className="proto-stage">
+      <div style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}>
+        <MobileC key={resetKey} start="home"/>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Prototype/>);
+</script>
+
+</body>
+</html>

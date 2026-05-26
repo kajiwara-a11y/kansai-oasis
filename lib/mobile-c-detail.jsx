@@ -1,0 +1,698 @@
+// ─────────────────────────────────────────────────────────────
+// MOBILE · VARIANT C — Detail screens / sub-views
+// product / shopping-list / aisle-map / recipe-detail
+// ai-chat / search / notif / barcode
+// ─────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────
+// PRODUCT detail
+// ─────────────────────────────────────────────────────────────
+function C_Product({ data, pop, push }) {
+  const p = data || { name: '国産 鶏もも肉', sub: '300g', price: 398, was: 598, kind: 'chicken' };
+  const off = p.was ? Math.round((1 - p.price / p.was) * 100) : 0;
+  const [fav, setFav] = React.useState(false);
+  const [claimed, setClaimed] = React.useState(false);
+  return (
+    <div style={{ height: '100%', overflowY: 'auto', background: T.bg }} className="oas-noscroll">
+      <C_TopBar leftBack onBack={pop} title={p.name} sub={`商品コード · 4901-2345-67890`}
+        right={<button onClick={() => setFav(f => !f)} style={{ ...iconBtn, color: '#fff' }}>
+          <Icon name={fav ? 'heartF' : 'heart'} size={20} color={fav ? T.orange : '#fff'}/>
+        </button>}/>
+      <div style={{ height: SAFE_TOP + 48 }}/>
+
+      {/* Hero image */}
+      <div style={{
+        height: 260, background: `linear-gradient(180deg, ${T.shelf} 0%, #fff 100%)`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
+      }}>
+        <FoodMark kind={p.kind} size={200}/>
+        {off > 0 && <div style={{
+          position: 'absolute', top: 12, left: 12, background: T.sale, color: '#fff', borderRadius: 4,
+          padding: '4px 10px', fontFamily: NUM, fontWeight: 900, fontSize: 14,
+        }}>{off}% OFF</div>}
+        <div style={{
+          position: 'absolute', bottom: 12, right: 12,
+          background: 'rgba(0,0,0,.6)', color: '#fff', borderRadius: 99,
+          padding: '4px 10px',
+          fontFamily: SANS, fontSize: 10, fontWeight: 600,
+        }}>1 / 4</div>
+      </div>
+
+      {/* Info */}
+      <div style={{ padding: '16px 16px 0' }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+          <Pill tone="sale" size="xs">本日限り</Pill>
+          <Pill tone="fresh" size="xs">国産</Pill>
+          <Pill tone="paperLine" size="xs">精肉</Pill>
+        </div>
+        <h1 style={{ fontFamily: SANS, fontWeight: 800, fontSize: 20, lineHeight: 1.3, margin: '0 0 4px', color: T.ink }}>
+          {p.name}<span style={{ fontSize: 13, color: T.inkSoft, fontWeight: 500, marginLeft: 6 }}>{p.sub}</span>
+        </h1>
+        <div style={{ fontFamily: SANS, fontSize: 11, color: T.inkSoft }}>JAN: 4901234567890 · 兵庫県産</div>
+
+        <div style={{ marginTop: 14, paddingBottom: 14, borderBottom: `1px solid ${T.outlineSoft}` }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <Yen value={p.price} size={36} tone="sale"/>
+            {p.was && <Yen value={p.was} size={13} strike/>}
+          </div>
+          <div style={{ fontFamily: SANS, fontSize: 11, color: T.inkSoft, marginTop: 4 }}>
+            税込 ¥{Math.round(p.price * 1.08)} · 100g あたり ¥{Math.round(p.price / 3)}
+          </div>
+        </div>
+
+        {/* AI tip — C-distinctive */}
+        <div style={{
+          marginTop: 14, background: T.brand, color: '#fff',
+          borderRadius: 12, padding: '12px 14px',
+          display: 'flex', gap: 12,
+        }}>
+          <div style={{
+            width: 30, height: 30, borderRadius: 999, background: T.orange,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+          }}>
+            <Icon name="sparkleF" size={15} color="#fff"/>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, color: T.orange, letterSpacing: '.15em', marginBottom: 3 }}>AI のおすすめ調理</div>
+            <div style={{ fontFamily: SANS, fontSize: 12.5, lineHeight: 1.6 }}>
+              親子丼 / 唐揚げ / 照り焼きに最適。本日の卵 (¥178) と合わせると <strong style={{ color: T.orange }}>¥576</strong> で 4 人前。
+            </div>
+          </div>
+        </div>
+
+        {/* Coupon */}
+        <div style={{
+          marginTop: 14, padding: '12px 14px', background: T.orangeSoft,
+          border: `1px dashed ${T.orange}`, borderRadius: 10,
+          display: 'flex', alignItems: 'center', gap: 10,
+        }}>
+          <Icon name="coupon" size={20} color={T.orangeDeep}/>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 12.5, color: T.orangeDeep }}>追加 ¥30 OFF クーポン</div>
+            <div style={{ fontFamily: SANS, fontSize: 10, color: T.orangeDeep, opacity: .8, marginTop: 1 }}>会員限定 · 本日 21:00 まで</div>
+          </div>
+          <button onClick={() => setClaimed(c => !c)} style={{
+            background: claimed ? '#fff' : T.orangeDeep, color: claimed ? T.orangeDeep : '#fff',
+            border: `1px solid ${T.orangeDeep}`, cursor: 'pointer',
+            padding: '7px 12px', borderRadius: 6,
+            fontFamily: SANS, fontWeight: 700, fontSize: 11,
+          }}>{claimed ? '取得済' : '取得'}</button>
+        </div>
+      </div>
+
+      {/* Aisle */}
+      <SectionHead title="この商品の売場" en="In-store" style={{ marginTop: 22 }}/>
+      <div style={{ padding: '0 16px' }}>
+        <div style={{
+          background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 12,
+          padding: 14, display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Icon name="pin" size={14} color={T.orange}/>
+              <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 13, color: T.ink }}>精肉 · 棚 B-3</span>
+            </div>
+            <p style={{ margin: '6px 0 0', fontFamily: SANS, fontSize: 11.5, color: T.inkMid, lineHeight: 1.6 }}>
+              入口からまっすぐ、青果の奥<br/>店内 約 22m · 徒歩 30 秒
+            </p>
+            <button onClick={() => push('aisle-map')} style={{
+              marginTop: 10, border: 0, background: T.brand, color: '#fff',
+              padding: '8px 14px', borderRadius: 6, cursor: 'pointer',
+              fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: '.05em',
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+            }}><Icon name="arrR" size={13} color="#fff"/> 売場へ案内</button>
+          </div>
+          <svg viewBox="0 0 100 78" width="100" height="78">
+            <rect x="2" y="2" width="96" height="74" fill={T.paperAlt} stroke={T.outline}/>
+            <rect x="10" y="10" width="18" height="12" fill={T.shelf} stroke={T.outline}/>
+            <rect x="32" y="10" width="18" height="12" fill={T.orange}/>
+            <rect x="54" y="10" width="18" height="12" fill={T.shelf} stroke={T.outline}/>
+            <rect x="76" y="10" width="14" height="12" fill={T.shelf} stroke={T.outline}/>
+            <rect x="10" y="42" width="80" height="8" fill={T.shelf} stroke={T.outline}/>
+            <path d="M14 66 L14 50 L41 50 L41 22" stroke={T.orange} strokeWidth="1.4" strokeDasharray="2 2" fill="none"/>
+            <circle cx="14" cy="66" r="2.8" fill={T.fresh}/>
+            <text x="41" y="32" textAnchor="middle" fontFamily={SANS} fontSize="6" fontWeight="800" fill="#fff">B-3</text>
+          </svg>
+        </div>
+      </div>
+
+      {/* Related — frequently bought */}
+      <SectionHead title="一緒に買われています" en="Frequently bought" style={{ marginTop: 22 }}/>
+      <div style={{ display: 'flex', gap: 10, padding: '0 16px', overflowX: 'auto', paddingBottom: 24 }} className="oas-noscroll">
+        {[
+          { name: '兵庫 朝採卵', sub: '10個', price: 178, was: 248, kind: 'egg' },
+          { name: '玉ねぎ',     sub: '3個',  price: 198,           kind: 'onion' },
+          { name: '三つ葉',     sub: '1束',  price: 128,           kind: 'cabbage' },
+          { name: 'ご飯 2合',   sub: '無洗米', price: 380,           kind: 'rice' },
+        ].map((p) => <ProductCard key={p.name} {...p} width={132} onTap={() => push('product', p)}/>)}
+      </div>
+
+      {/* Spec */}
+      <SectionHead title="商品情報" en="Details" style={{ marginTop: 6 }}/>
+      <div style={{ padding: '0 16px 24px' }}>
+        <div style={{ background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 10, overflow: 'hidden' }}>
+          {[
+            ['原産地',   '兵庫県'],
+            ['加工日',   '2026年11月25日'],
+            ['消費期限', '2026年11月27日'],
+            ['内容量',   '300g'],
+            ['保存方法', '4°C 以下で冷蔵保存'],
+          ].map(([k, v], i) => (
+            <div key={k} style={{
+              padding: '11px 14px', display: 'flex', alignItems: 'baseline', gap: 12,
+              borderTop: i ? `1px solid ${T.outlineSoft}` : 'none',
+            }}>
+              <span style={{ flex: '0 0 80px', fontFamily: SANS, fontSize: 10.5, color: T.inkSoft, fontWeight: 600, letterSpacing: '.1em' }}>{k}</span>
+              <span style={{ flex: 1, fontFamily: SANS, fontSize: 12.5, color: T.ink, fontWeight: 500 }}>{v}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0,
+        padding: '12px 16px 22px', background: '#fff',
+        borderTop: `1px solid ${T.outlineSoft}`,
+        display: 'flex', alignItems: 'center', gap: 10,
+      }}>
+        <button onClick={() => setFav(f => !f)} style={{
+          width: 48, height: 48, background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 8,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}><Icon name={fav ? 'heartF' : 'heart'} size={20} color={fav ? T.orange : T.inkMid}/></button>
+        <button onClick={() => push('shopping-list')} style={{
+          flex: 1, background: T.orange, color: '#fff', border: 0, cursor: 'pointer',
+          padding: '14px 0', borderRadius: 8,
+          fontFamily: SANS, fontWeight: 800, fontSize: 14, letterSpacing: '.08em',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          boxShadow: '0 4px 12px rgba(46,133,64,.3)',
+        }}>
+          <Icon name="cart" size={18} color="#fff"/>
+          リストに追加
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// SHOPPING LIST — full view
+// ─────────────────────────────────────────────────────────────
+function C_ShoppingList({ pop, push }) {
+  const [suggestionAdded, setSuggestionAdded] = React.useState(false);
+  const [suggestionDismissed, setSuggestionDismissed] = React.useState(false);
+  const [items, setItems] = React.useState([
+    { aisle: '青果',  n: 1, list: [
+      { id: 1, name: '玉ねぎ',     sub: '3個',  price: 198, was: 248, kind: 'onion',   done: false, tag: '特売' },
+      { id: 2, name: '三つ葉',     sub: '1束',  price: 128,           kind: 'cabbage', done: false },
+    ]},
+    { aisle: '精肉',  n: 2, list: [
+      { id: 3, name: '国産 鶏もも肉', sub: '300g', price: 398, was: 598, kind: 'chicken', done: true,  tag: '特売' },
+    ]},
+    { aisle: '日配',  n: 3, list: [
+      { id: 4, name: '兵庫 朝採卵', sub: '10個', price: 178, was: 248, kind: 'egg',  done: true, tag: 'クーポン' },
+      { id: 5, name: '木綿豆腐',     sub: '300g', price:  88,           kind: 'tofu', done: false },
+    ]},
+    { aisle: '鮮魚',  n: 4, list: [
+      { id: 6, name: '北海道 銀鮭', sub: '2切', price: 498, was: 698, kind: 'salmon', done: false, tag: '特売' },
+    ]},
+  ]);
+  const toggle = (id) => setItems(g => g.map(grp => ({
+    ...grp, list: grp.list.map(i => i.id === id ? { ...i, done: !i.done } : i)
+  })));
+  const flat = items.flatMap(g => g.list);
+  const done = flat.filter(i => i.done).length;
+  const total = flat.reduce((s, i) => s + i.price, 0);
+
+  return (
+    <div style={{ height: '100%', overflowY: 'auto', background: T.bg, paddingBottom: 130 }} className="oas-noscroll">
+      <C_TopBar leftBack onBack={pop} title="買い物リスト" sub={`${flat.length} 品 · 神戸三宮店`}
+        right={<button onClick={() => push('search')} style={iconBtn}><Icon name="plus" size={22} color="#fff"/></button>}/>
+      <div style={{ height: SAFE_TOP + 48 }}/>
+
+      {/* Progress card */}
+      <div style={{ padding: '14px 16px 0' }}>
+        <div style={{
+          background: `linear-gradient(140deg, ${T.brand} 0%, #2a2520 100%)`,
+          color: '#fff', borderRadius: 14, padding: '16px 16px',
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute', top: -30, right: -30, width: 150, height: 150,
+            background: `radial-gradient(circle, ${T.orange} 0%, transparent 65%)`,
+            opacity: .35,
+          }}/>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div>
+              <div style={{ fontFamily: SANS, fontSize: 10, color: T.orange, fontWeight: 700, letterSpacing: '.2em' }}>SHOPPING</div>
+              <div style={{ marginTop: 4 }}>
+                <span className="oas-num" style={{ fontFamily: NUM, fontWeight: 900, fontSize: 32, color: '#fff', letterSpacing: '-.02em' }}>{done}</span>
+                <span style={{ fontFamily: NUM, fontWeight: 700, fontSize: 16, color: 'rgba(255,255,255,.5)', margin: '0 4px' }}>/</span>
+                <span style={{ fontFamily: NUM, fontWeight: 700, fontSize: 20, color: 'rgba(255,255,255,.7)' }}>{flat.length}</span>
+                <span style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,.6)', marginLeft: 6, fontWeight: 600 }}>品 取得</span>
+              </div>
+            </div>
+            <div style={{ flex: 1 }}/>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontFamily: SANS, fontSize: 10, color: 'rgba(255,255,255,.6)' }}>合計</div>
+              <Yen value={total - 50} size={22} style={{ color: '#fff' }}/>
+              <div style={{ fontFamily: SANS, fontSize: 10, color: T.orange, marginTop: 1, fontWeight: 700 }}>−¥50 クーポン</div>
+            </div>
+          </div>
+          {/* progress bar */}
+          <div style={{
+            position: 'relative', marginTop: 14, height: 6, background: 'rgba(255,255,255,.12)', borderRadius: 99,
+          }}>
+            <div style={{
+              width: `${(done / flat.length) * 100}%`, height: '100%',
+              background: T.orange, borderRadius: 99,
+            }}/>
+          </div>
+        </div>
+      </div>
+
+      {/* Aisle nav CTA */}
+      <div style={{ padding: '12px 16px 0' }}>
+        <button onClick={() => push('aisle-map')} style={{
+          width: '100%', background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 12,
+          padding: '12px 14px', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+          display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: 8, background: T.orangeSoft, color: T.orange,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}><Icon name="pin" size={22} color={T.orange}/></div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 13, color: T.ink }}>店内ナビを始める</div>
+            <div style={{ fontFamily: SANS, fontSize: 11, color: T.inkMid, marginTop: 2 }}>最適順路で 約 12 分 · 店内 220m</div>
+          </div>
+          <Icon name="chevR" size={18} color={T.brown}/>
+        </button>
+      </div>
+
+      {/* Groups */}
+      <div style={{ padding: '14px 16px 0' }}>
+        {items.map((g) => (
+          <div key={g.aisle} style={{ marginTop: 6, marginBottom: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
+              <span style={{
+                width: 22, height: 22, borderRadius: 999, background: T.brand, color: '#fff',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: NUM, fontSize: 11, fontWeight: 800,
+              }}>{g.n}</span>
+              <h3 style={{ margin: 0, fontFamily: SANS, fontWeight: 800, fontSize: 14, color: T.ink }}>{g.aisle}</h3>
+              <span style={{ fontFamily: SANS, fontSize: 10, color: T.inkSoft, fontWeight: 600 }}>{g.list.length} 品</span>
+              <div style={{ flex: 1, height: 1, background: T.outlineSoft, marginLeft: 6 }}/>
+            </div>
+            <div style={{ background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 10, overflow: 'hidden' }}>
+              {g.list.map((it, i) => (
+                <div key={it.id} style={{
+                  padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
+                  borderTop: i ? `1px solid ${T.outlineSoft}` : 'none',
+                  opacity: it.done ? .5 : 1,
+                }}>
+                  <button onClick={() => toggle(it.id)} style={{
+                    width: 22, height: 22, borderRadius: 999,
+                    border: `1.5px solid ${it.done ? T.orange : T.outline}`,
+                    background: it.done ? T.orange : '#fff',
+                    cursor: 'pointer', flex: '0 0 auto',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>{it.done && <Icon name="check" size={12} color="#fff" sw={2.5}/>}</button>
+                  <FoodMark kind={it.kind} size={32} bg={T.paperAlt}/>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontFamily: SANS, fontWeight: 700, fontSize: 12.5, color: T.ink,
+                      textDecoration: it.done ? 'line-through' : 'none',
+                    }}>{it.name}<span style={{ color: T.inkSoft, fontWeight: 500, fontSize: 10, marginLeft: 4 }}>{it.sub}</span></div>
+                    {it.tag && <span style={{ fontFamily: SANS, fontSize: 9.5, color: T.sale, fontWeight: 700, marginTop: 1, display: 'inline-block' }}>{it.tag}</span>}
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <Yen value={it.price} size={13}/>
+                    {it.was && <div><Yen value={it.was} size={9} strike/></div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* AI suggestion */}
+      <div style={{ padding: '0 16px 0' }}>
+        <div style={{
+          background: T.orangeSoft, border: `1px solid ${T.orange}`, borderRadius: 12,
+          padding: '14px 16px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <Icon name="sparkleF" size={14} color={T.orangeDeep}/>
+            <span style={{ fontFamily: SANS, fontSize: 10, color: T.orangeDeep, fontWeight: 800, letterSpacing: '.15em' }}>AIからの提案</span>
+          </div>
+          <p style={{ margin: 0, fontFamily: SANS, fontSize: 12.5, lineHeight: 1.7, color: T.orangeDeep }}>
+            親子丼と一緒に「味噌汁」はいかがでしょう。<strong>油揚げ (¥98)</strong> と <strong>長ねぎ (¥128)</strong> を本日 10% OFF で。
+          </p>
+          <div style={{ marginTop: 10, display: 'flex', gap: 6 }}>
+            <button onClick={() => {
+              if (suggestionAdded) return;
+              setSuggestionAdded(true);
+              setItems(prev => prev.map(g => g.aisle === '日配' ? {
+                ...g, list: [
+                  ...g.list,
+                  { id: 101, name: '油揚げ', sub: '1パック', price: 98, kind: 'tofu', done: false, tag: 'AI追加' },
+                  { id: 102, name: '長ねぎ', sub: '1本',     price: 128, kind: 'cabbage', done: false, tag: 'AI追加' },
+                ]
+              } : g));
+            }} style={{
+              background: suggestionAdded ? '#fff' : T.orangeDeep, color: suggestionAdded ? T.orangeDeep : '#fff', border: `1px solid ${T.orangeDeep}`, cursor: 'pointer',
+              padding: '8px 14px', borderRadius: 6,
+              fontFamily: SANS, fontWeight: 800, fontSize: 11,
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+            }}>{suggestionAdded ? <><Icon name="check" size={12} color={T.orangeDeep} sw={2.5}/> 追加済 (+2品)</> : '追加'}</button>
+            <button onClick={() => setSuggestionDismissed(true)} style={{
+              background: 'transparent', color: T.orangeDeep, border: 0, cursor: 'pointer',
+              padding: '8px 10px', opacity: suggestionDismissed ? 0.5 : 1,
+              fontFamily: SANS, fontWeight: 700, fontSize: 11,
+            }}>{suggestionDismissed ? '保留中' : 'あとで'}</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom action */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0,
+        padding: '12px 16px 22px', background: '#fff',
+        borderTop: `1px solid ${T.outlineSoft}`,
+        display: 'flex', alignItems: 'center', gap: 10,
+      }}>
+        <button onClick={() => push('aisle-map')} style={{
+          flex: 1, background: T.brand, color: '#fff', border: 0, cursor: 'pointer',
+          padding: '14px 0', borderRadius: 8,
+          fontFamily: SANS, fontWeight: 800, fontSize: 13.5, letterSpacing: '.05em',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        }}>
+          <Icon name="pin" size={16} color="#fff"/>
+          店内ナビを始める
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// AISLE MAP / Store nav
+// ─────────────────────────────────────────────────────────────
+function C_AisleMap({ pop }) {
+  const [step, setStep] = React.useState(2);
+  const steps = [
+    { aisle: '青果',  it: '玉ねぎ + 三つ葉', dist: '0m',  pos: { x: 30, y: 60 } },
+    { aisle: '精肉',  it: '鶏もも肉',        dist: '32m', pos: { x: 130, y: 35 } },
+    { aisle: '日配',  it: '卵 + 豆腐',       dist: '58m', pos: { x: 30, y: 110 } },
+    { aisle: '鮮魚',  it: '銀鮭',            dist: '92m', pos: { x: 230, y: 35 } },
+  ];
+  const cur = steps[step];
+  return (
+    <div style={{ height: '100%', background: T.bg, display: 'flex', flexDirection: 'column' }}>
+      <C_TopBar leftBack onBack={pop} title="店内ナビ" sub="神戸三宮店 · 約 12 分"/>
+      <div style={{ height: SAFE_TOP + 48 }}/>
+
+      {/* Current step instruction */}
+      <div style={{ padding: '14px 16px 0' }}>
+        <div style={{
+          background: T.brand, color: '#fff', borderRadius: 14, padding: '14px 16px',
+          display: 'flex', alignItems: 'center', gap: 14,
+        }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 12, background: T.orange,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+            color: '#fff', fontFamily: NUM, fontWeight: 900, fontSize: 22,
+          }}>{step + 1}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: SANS, fontSize: 10, color: T.orange, fontWeight: 700, letterSpacing: '.15em' }}>STEP {step + 1} / {steps.length}</div>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 17, marginTop: 2 }}>{cur.aisle} へ</div>
+            <div style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,.7)', marginTop: 2 }}>{cur.it} · {cur.dist}</div>
+          </div>
+          <Icon name="arrR" size={28} color={T.orange} sw={2}/>
+        </div>
+      </div>
+
+      {/* Map */}
+      <div style={{ flex: 1, padding: '14px 16px 0', minHeight: 0 }}>
+        <div style={{
+          background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 14,
+          height: '100%', padding: 14, position: 'relative', overflow: 'hidden',
+        }}>
+          <svg viewBox="0 0 300 200" style={{ width: '100%', height: '100%' }}>
+            {/* Aisles */}
+            {[
+              { x: 10,  y: 10,  w: 80,  h: 38, l: '青果', id: 0, c: T.freshSoft, ic: T.fresh },
+              { x: 96,  y: 10,  w: 80,  h: 38, l: '精肉', id: 1, c: T.saleSoft,  ic: T.sale },
+              { x: 182, y: 10,  w: 108, h: 38, l: '鮮魚', id: 3, c: '#cfe1ef',   ic: '#1f6ba8' },
+              { x: 10,  y: 58,  w: 60,  h: 76, l: '日配', id: 2, c: T.orangeSoft, ic: T.orange },
+              { x: 76,  y: 58,  w: 60,  h: 76, l: '冷蔵' },
+              { x: 142, y: 58,  w: 60,  h: 76, l: '冷凍' },
+              { x: 208, y: 58,  w: 82,  h: 36, l: '惣菜' },
+              { x: 208, y: 100, w: 82,  h: 34, l: 'ベーカリー' },
+              { x: 10,  y: 144, w: 130, h: 30, l: '酒類 · 飲料' },
+              { x: 146, y: 144, w: 96,  h: 30, l: 'レジ' },
+              { x: 248, y: 144, w: 42,  h: 30, l: '出口' },
+            ].map((a, i) => {
+              const isStep = steps.some(s => s.aisle === a.l);
+              const stepIdx = steps.findIndex(s => s.aisle === a.l);
+              const cur = stepIdx === step;
+              return (
+                <g key={i}>
+                  <rect x={a.x} y={a.y} width={a.w} height={a.h}
+                        fill={cur ? T.orange : (isStep ? (a.c || T.paperAlt) : '#fff')}
+                        stroke={cur ? T.orangeDeep : T.outline}
+                        strokeWidth={cur ? 2 : 1}/>
+                  <text x={a.x + a.w/2} y={a.y + a.h/2 + 4} textAnchor="middle"
+                        fontFamily={SANS} fontWeight="800"
+                        fontSize={a.l.length > 4 ? 9 : 11}
+                        fill={cur ? '#fff' : (a.ic || T.ink)}>{a.l}</text>
+                  {isStep && !cur && (
+                    <circle cx={a.x + a.w - 6} cy={a.y + 6} r="6" fill={T.ink}>
+                      <title>{stepIdx + 1}</title>
+                    </circle>
+                  )}
+                  {isStep && !cur && (
+                    <text x={a.x + a.w - 6} y={a.y + 9} textAnchor="middle"
+                          fontFamily={NUM} fontWeight="900" fontSize="8" fill="#fff">{stepIdx + 1}</text>
+                  )}
+                </g>
+              );
+            })}
+            {/* Path */}
+            <path d="M40 175 L40 76 L41 76 L41 30 L130 30 L130 76 L40 76 L40 96 L182 96 L240 30"
+              stroke={T.orange} strokeWidth="2.2" strokeDasharray="5 3" fill="none" strokeLinecap="round"/>
+            {/* You marker */}
+            <g transform="translate(40 175)">
+              <circle r="6" fill={T.fresh}/>
+              <circle r="11" fill={T.fresh} opacity=".25"/>
+            </g>
+            {/* Target */}
+            <g transform="translate(130 30)">
+              <path d="M0 -10c-6 0-9 5-9 8c0 5 9 12 9 12s9-7 9-12c0-3-3-8-9-8z" fill={T.sale}/>
+              <circle cy="-2" r="2.5" fill="#fff"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      {/* AI hint */}
+      <div style={{ padding: '12px 16px 0' }}>
+        <div style={{
+          background: T.orangeSoft, border: `1px solid ${T.orange}`, borderRadius: 10,
+          padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
+        }}>
+          <Icon name="sparkleF" size={16} color={T.orangeDeep}/>
+          <div style={{ flex: 1, fontFamily: SANS, fontSize: 11.5, color: T.orangeDeep, lineHeight: 1.5 }}>
+            鶏もも肉の隣に <strong>本日限り ¥30 OFF</strong> の卵があります
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom step nav */}
+      <div style={{
+        padding: '12px 16px 22px', background: '#fff',
+        borderTop: `1px solid ${T.outlineSoft}`,
+        display: 'flex', alignItems: 'center', gap: 10,
+      }}>
+        <button onClick={() => setStep(s => Math.max(0, s - 1))} style={{
+          width: 48, height: 48, background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 8,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          opacity: step > 0 ? 1 : .4,
+        }}><Icon name="chevL" size={20} color={T.ink}/></button>
+        <button onClick={() => setStep(s => Math.min(steps.length - 1, s + 1))} style={{
+          flex: 1, background: T.orange, color: '#fff', border: 0, cursor: 'pointer',
+          padding: '14px 0', borderRadius: 8,
+          fontFamily: SANS, fontWeight: 800, fontSize: 13, letterSpacing: '.05em',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        }}><Icon name="check" size={16} color="#fff"/> 商品を取得した</button>
+        <button onClick={() => setStep(s => Math.min(steps.length - 1, s + 1))} style={{
+          width: 48, height: 48, background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 8,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          opacity: step < steps.length - 1 ? 1 : .4,
+        }}><Icon name="chevR" size={20} color={T.ink}/></button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// RECIPE detail (C tone)
+// ─────────────────────────────────────────────────────────────
+function C_RecipeDetail({ data, pop, push }) {
+  const [recipeFav, setRecipeFav] = React.useState(false);
+  const ing = [
+    { name: '鶏もも肉',   sub: '300g',  price: 398, kind: 'chicken', tag: '特売' },
+    { name: '卵',         sub: '4個',   price:  72, kind: 'egg',     tag: 'クーポン' },
+    { name: '玉ねぎ',     sub: '中1個', price:  68, kind: 'onion' },
+    { name: '三つ葉',     sub: '1束',   price: 128, kind: 'cabbage' },
+    { name: 'ご飯',       sub: '2合',   price: 380, kind: 'rice' },
+    { name: '出汁・調味料', sub: '一式', price: 134, kind: 'tofu' },
+  ];
+  const steps = [
+    '玉ねぎを薄切りに、鶏もも肉は一口大に切る。',
+    'フライパンに出汁・醤油・みりん・砂糖を入れ、玉ねぎがしんなりするまで煮る。',
+    '鶏肉を加え、火が通るまで4〜5分煮る。',
+    '溶き卵を半分ずつ回し入れ、半熟になったらご飯にのせ、三つ葉を添える。',
+  ];
+  const total = ing.reduce((s, i) => s + i.price, 0);
+  return (
+    <div style={{ height: '100%', overflowY: 'auto', background: T.bg, position: 'relative' }} className="oas-noscroll">
+      <C_TopBar leftBack onBack={pop} title="親子丼"
+        right={<button onClick={() => setRecipeFav(f => !f)} style={{ ...iconBtn, color: '#fff' }}><Icon name={recipeFav ? 'heartF' : 'heart'} size={20} color={recipeFav ? T.orange : '#fff'}/></button>}/>
+      <div style={{ height: SAFE_TOP + 48 }}/>
+
+      {/* Hero */}
+      <div style={{
+        height: 220, background: `linear-gradient(180deg, #fdf2db 0%, #fff 100%)`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <FoodMark kind="oyakodon" size={170}/>
+      </div>
+
+      <div style={{ padding: '14px 16px 130px' }}>
+        <Pill tone="orange" size="xs">AIおすすめ · 本日の特売を使用</Pill>
+        <h1 style={{ fontFamily: SANS, fontWeight: 900, fontSize: 22, lineHeight: 1.2, margin: '8px 0 4px', color: T.ink }}>ふんわり親子丼</h1>
+        <p style={{ margin: 0, fontFamily: SANS, fontSize: 12, color: T.inkMid, lineHeight: 1.6 }}>
+          特売の鶏もも肉と、兵庫の朝採り卵を使った定番。半熟の卵と三つ葉が決め手。
+        </p>
+
+        {/* Meta */}
+        <div style={{
+          marginTop: 14, padding: '12px 0', borderTop: `1px solid ${T.outlineSoft}`, borderBottom: `1px solid ${T.outlineSoft}`,
+          display: 'flex',
+        }}>
+          {[
+            { big: '15', sub: '分', label: '調理',  i: 'clock' },
+            { big: '4',  sub: '人前', label: '人数', i: 'user' },
+            { big: '628', sub: 'kcal', label: '1人', i: 'flame' },
+          ].map((m, i, a) => (
+            <div key={i} style={{
+              flex: 1, textAlign: 'center',
+              borderRight: i < a.length - 1 ? `1px solid ${T.outlineSoft}` : 'none',
+            }}>
+              <Icon name={m.i} size={13} color={T.brown}/>
+              <div style={{ fontFamily: NUM, fontWeight: 800, fontSize: 22, color: T.ink, lineHeight: 1, marginTop: 4 }}>
+                {m.big}<span style={{ fontSize: 11, fontFamily: SANS, color: T.inkSoft, marginLeft: 2, fontWeight: 600 }}>{m.sub}</span>
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 9, color: T.inkSoft, marginTop: 3, fontWeight: 600, letterSpacing: '.1em' }}>{m.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Ingredients */}
+        <SectionHead title="材料" en="Ingredients" style={{ padding: 0, marginTop: 18 }}/>
+        <div style={{ background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 12, overflow: 'hidden', marginTop: 8 }}>
+          {ing.map((i, idx) => (
+            <div key={idx} style={{
+              padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
+              borderTop: idx ? `1px solid ${T.outlineSoft}` : 'none',
+            }}>
+              <FoodMark kind={i.kind} size={30} bg={T.paperAlt}/>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12.5, color: T.ink }}>
+                  {i.name}<span style={{ color: T.inkSoft, fontWeight: 500, fontSize: 10, marginLeft: 4 }}>{i.sub}</span>
+                </div>
+                {i.tag && <span style={{ fontFamily: SANS, fontSize: 10, color: T.sale, fontWeight: 700, marginTop: 2, display: 'inline-block' }}>{i.tag}</span>}
+              </div>
+              <Yen value={i.price} size={13}/>
+            </div>
+          ))}
+          <div style={{
+            padding: '10px 12px', background: T.paperAlt,
+            display: 'flex', alignItems: 'baseline', gap: 6,
+            borderTop: `1px solid ${T.outlineSoft}`,
+          }}>
+            <span style={{ fontFamily: SANS, fontSize: 10.5, color: T.inkMid, fontWeight: 700, flex: 1 }}>合計 (クーポン後)</span>
+            <Yen value={total - 220} size={20} tone="sale"/>
+            <Yen value={total} size={10} strike/>
+          </div>
+        </div>
+
+        {/* Steps */}
+        <SectionHead title="作り方" en="Method" style={{ padding: 0, marginTop: 20 }}/>
+        <div style={{ marginTop: 8 }}>
+          {steps.map((s, i) => (
+            <div key={i} style={{ display: 'flex', gap: 12, paddingBottom: 14 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 999, background: T.orange, color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+                fontFamily: NUM, fontWeight: 900, fontSize: 13,
+              }}>{i + 1}</div>
+              <div style={{
+                flex: 1, fontFamily: SANS, fontSize: 13, lineHeight: 1.7,
+                color: T.ink, paddingTop: 4,
+              }}>{s}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* AI tip */}
+        <div style={{
+          marginTop: 4, background: T.brand, color: '#fff',
+          borderRadius: 12, padding: '14px 16px',
+          display: 'flex', gap: 12,
+        }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 999, background: T.orange,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+          }}>
+            <Icon name="sparkleF" size={15} color="#fff"/>
+          </div>
+          <div>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 11, letterSpacing: '.1em', marginBottom: 4, color: T.orange }}>AIのワンポイント</div>
+            <div style={{ fontFamily: SANS, fontSize: 12.5, lineHeight: 1.7 }}>
+              三つ葉が苦手な方は刻みネギで。とろみを強くしたければ卵を一つ増やしてください。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0,
+        padding: '12px 16px 22px', background: '#fff',
+        borderTop: `1px solid ${T.outlineSoft}`,
+        display: 'flex', alignItems: 'center', gap: 10,
+      }}>
+        <div style={{ flex: '0 0 auto' }}>
+          <div style={{ fontFamily: SANS, fontSize: 9.5, color: T.inkSoft, fontWeight: 700 }}>4人前 計</div>
+          <Yen value={1180} size={20} tone="sale"/>
+        </div>
+        <button onClick={() => push('shopping-list')} style={{
+          flex: 1, background: T.orange, color: '#fff', border: 0, cursor: 'pointer',
+          padding: '14px 0', borderRadius: 8,
+          fontFamily: SANS, fontWeight: 800, fontSize: 13.5, letterSpacing: '.06em',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          boxShadow: '0 4px 12px rgba(46,133,64,.3)',
+        }}>
+          <Icon name="cart" size={18} color="#fff"/>
+          買い物リストに追加
+        </button>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { C_Product, C_ShoppingList, C_AisleMap, C_RecipeDetail });
