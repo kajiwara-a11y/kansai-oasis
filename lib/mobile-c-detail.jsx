@@ -413,6 +413,94 @@ function C_AisleMap({ pop, push }) {
     { aisle: '日配',  it: '卵 + 豆腐',       dist: '58m', pos: { x: 30, y: 110 } },
     { aisle: '鮮魚',  it: '銀鮭',            dist: '92m', pos: { x: 230, y: 35 } },
   ];
+
+  // ── per-floor layouts ─────────────────────────────────────────
+  const FLOOR_DATA = {
+    '1F': {
+      en: 'FOOD HALL',
+      sections: [
+        { id: 'produce',  x: 14,  y: 22,  w: 132, h: 80, l: '青果',       en: 'PRODUCE',  tint: '#e1ecc8', border: '#9bbd72', color: '#43652b', cats: ['food'] },
+        { id: 'fish',     x: 174, y: 22,  w: 80,  h: 80, l: '鮮魚',       en: 'SEAFOOD',  tint: '#d5e6f2', border: '#7ba6c5', color: '#1f4a6b', cats: ['food'] },
+        { id: 'bakery',   x: 262, y: 22,  w: 44,  h: 80, l: 'ベーカリー', en: 'BAKERY',   tint: '#f6e2c8', border: '#d4ae72', color: '#7a5320', cats: ['deli'] },
+        { id: 'meat',     x: 14,  y: 130, w: 92,  h: 72, l: '精肉',       en: 'MEAT',     tint: '#fadcde', border: '#d6868c', color: '#8a2a30', cats: ['food'] },
+        { id: 'chilled',  x: 114, y: 130, w: 38,  h: 72, l: '冷蔵',       en: 'CHILLED',  tint: '#e3edf5', border: '#a8b9c8', color: '#3a4f60', cats: ['food'] },
+        { id: 'frozen',   x: 168, y: 130, w: 38,  h: 72, l: '冷凍',       en: 'FROZEN',   tint: '#d8e8f2', border: '#7da3bb', color: '#2a4658', cats: ['food'] },
+        { id: 'deli',     x: 214, y: 130, w: 44,  h: 36, l: '惣菜',       en: 'DELI',     tint: '#fde8d2', border: '#e0a86a', color: '#7a4520', cats: ['deli'] },
+        { id: 'sushi',    x: 214, y: 168, w: 44,  h: 34, l: '寿司',       en: 'SUSHI',    tint: '#fadcc8', border: '#dc9d6c', color: '#7a3a18', cats: ['deli'] },
+        { id: 'bento',    x: 264, y: 130, w: 42,  h: 36, l: '弁当',       en: 'BENTO',    tint: '#fde8d2', border: '#e0a86a', color: '#7a4520', cats: ['deli'] },
+        { id: 'pantry',   x: 264, y: 168, w: 42,  h: 34, l: '加工',       en: 'PANTRY',   tint: '#efe6d3', border: '#c8b990', color: '#5a4530', cats: ['food'] },
+        { id: 'dairy',    x: 14,  y: 206, w: 64,  h: 22, l: '日配',       en: 'DAIRY',    tint: '#fcebd2', border: '#d9a86a', color: '#7a5320', cats: ['food'] },
+        { id: 'rice',     x: 80,  y: 206, w: 30,  h: 22, l: '米',         en: 'RICE',     tint: '#f3eedd', border: '#c6a56c', color: '#5a4530', cats: ['food'] },
+        { id: 'liquor',   x: 112, y: 206, w: 70,  h: 22, l: '酒類・飲料', en: 'LIQUOR',   tint: '#f3e8d6', border: '#bda57a', color: '#5a4530', cats: ['liquor'] },
+        { id: 'register', x: 198, y: 206, w: 60,  h: 22, l: 'レジ',       en: 'CHECKOUT', tint: '#fff7e6', border: '#c6a56c', color: '#5a4530', cats: ['service'] },
+        { id: 'exit',     x: 264, y: 206, w: 42,  h: 22, l: '出口',       en: 'EXIT',     tint: '#fff',    border: T.outlineSoft, color: T.inkMid, cats: ['service'] },
+      ],
+      pois: [
+        { x: 60,  y: 60  }, { x: 100, y: 80  }, { x: 200, y: 50  }, { x: 220, y: 80  },
+        { x: 280, y: 60  }, { x: 40,  y: 150 }, { x: 70,  y: 175 }, { x: 135, y: 155 },
+        { x: 188, y: 165 }, { x: 235, y: 148 }, { x: 285, y: 148 }, { x: 235, y: 185 },
+        { x: 40,  y: 218 }, { x: 65,  y: 218 }, { x: 145, y: 218 },
+      ],
+      chips: [
+        { v: 'all',     l: 'すべて'   },
+        { v: 'food',    l: '食材'     },
+        { v: 'deli',    l: '惣菜・パン' },
+        { v: 'liquor',  l: 'お酒・飲料' },
+        { v: 'service', l: 'レジ・出口' },
+      ],
+      showRoute: true,
+    },
+    '2F': {
+      en: 'LIFESTYLE',
+      sections: [
+        { id: 'fashion',   x: 14,  y: 22,  w: 152, h: 80, l: 'ファッション', en: 'APPAREL',    tint: '#fadcde', border: '#d6868c', color: '#8a2a30', cats: ['lifestyle'] },
+        { id: 'kids',      x: 174, y: 22,  w: 132, h: 80, l: '子供服',       en: 'KIDS',       tint: '#fde8d2', border: '#e0a86a', color: '#7a4520', cats: ['lifestyle'] },
+        { id: 'kitchen',   x: 14,  y: 130, w: 96,  h: 72, l: 'キッチン雑貨', en: 'KITCHEN',    tint: '#e1ecc8', border: '#9bbd72', color: '#43652b', cats: ['household'] },
+        { id: 'daily',     x: 118, y: 130, w: 82,  h: 72, l: '日用品',       en: 'DAILY GOODS',tint: '#d5e6f2', border: '#7ba6c5', color: '#1f4a6b', cats: ['household'] },
+        { id: 'cosmetics', x: 208, y: 130, w: 62,  h: 72, l: '化粧品',       en: 'BEAUTY',     tint: '#fadcde', border: '#d6868c', color: '#8a2a30', cats: ['beauty'] },
+        { id: 'stationery',x: 278, y: 130, w: 28,  h: 72, l: '文具',         en: 'STATIONERY', tint: '#efe6d3', border: '#c8b990', color: '#5a4530', cats: ['household'] },
+        { id: 'cafe',      x: 14,  y: 206, w: 130, h: 22, l: 'カフェ',       en: 'CAFE',       tint: '#f3e8d6', border: '#bda57a', color: '#5a4530', cats: ['food'] },
+        { id: 'register2', x: 150, y: 206, w: 96,  h: 22, l: 'レジ',         en: 'CHECKOUT',   tint: '#fff7e6', border: '#c6a56c', color: '#5a4530', cats: ['service'] },
+        { id: 'stairs2',   x: 252, y: 206, w: 54,  h: 22, l: '階段・EV',     en: 'STAIRS',     tint: '#fff',    border: T.outlineSoft, color: T.inkMid, cats: ['service'] },
+      ],
+      pois: [
+        { x: 60, y: 50 }, { x: 100, y: 80 }, { x: 220, y: 55 }, { x: 250, y: 80 },
+        { x: 40, y: 160 }, { x: 80, y: 175 }, { x: 150, y: 165 }, { x: 230, y: 160 },
+      ],
+      chips: [
+        { v: 'all',       l: 'すべて'       },
+        { v: 'lifestyle', l: 'ファッション' },
+        { v: 'household', l: '日用品'       },
+        { v: 'beauty',    l: '化粧品'       },
+        { v: 'service',   l: 'レジ'         },
+      ],
+      showRoute: false,
+    },
+    'B1': {
+      en: 'PARKING',
+      sections: [
+        { id: 'lotA',     x: 14,  y: 22,  w: 196, h: 100, l: '駐車場 A',  en: 'PARKING A',  tint: '#e3edf5', border: '#a8b9c8', color: '#3a4f60', cats: ['parking'] },
+        { id: 'ev',       x: 218, y: 22,  w: 88,  h: 48,  l: 'EV 充電',   en: 'EV CHARGE',  tint: '#e1ecc8', border: '#9bbd72', color: '#43652b', cats: ['parking'] },
+        { id: 'bike',     x: 218, y: 76,  w: 88,  h: 46,  l: '自転車置場', en: 'BIKE PARK',  tint: '#fcebd2', border: '#d9a86a', color: '#7a5320', cats: ['parking'] },
+        { id: 'lotB',     x: 14,  y: 130, w: 196, h: 72,  l: '駐車場 B',  en: 'PARKING B',  tint: '#e3edf5', border: '#a8b9c8', color: '#3a4f60', cats: ['parking'] },
+        { id: 'gate',     x: 218, y: 130, w: 88,  h: 72,  l: '入退場ゲート', en: 'GATE',     tint: '#fff7e6', border: '#c6a56c', color: '#5a4530', cats: ['gate'] },
+        { id: 'elevatorB',x: 14,  y: 206, w: 196, h: 22,  l: 'エレベーター',  en: 'ELEVATOR', tint: '#fff',    border: T.outlineSoft, color: T.inkMid, cats: ['gate'] },
+        { id: 'stairsB',  x: 218, y: 206, w: 88,  h: 22,  l: '階段',      en: 'STAIRS',    tint: '#fff',    border: T.outlineSoft, color: T.inkMid, cats: ['gate'] },
+      ],
+      pois: [],
+      chips: [
+        { v: 'all',     l: 'すべて'   },
+        { v: 'parking', l: '駐車場'   },
+        { v: 'gate',    l: '入退場'   },
+      ],
+      showRoute: false,
+    },
+  };
+  const floorData = FLOOR_DATA[floor] || FLOOR_DATA['1F'];
+  const sections = floorData.sections;
+  const pois = floorData.pois;
+  const chips = floorData.chips;
+  const showRoute = floorData.showRoute;
   const safeStep = Math.min(Math.max(step, 0), steps.length - 1);
   const cur = steps[safeStep];
   const isLast = safeStep >= steps.length - 1;
@@ -461,7 +549,7 @@ function C_AisleMap({ pop, push }) {
             border: `1px solid ${T.outlineSoft}`,
           }}>
             {['2F', '1F', 'B1'].map((f) => (
-              <button key={f} onClick={() => setFloor(f)} style={{
+              <button key={f} onClick={() => { setFloor(f); setFilter('all'); }} style={{
                 width: 32, height: 32, borderRadius: 7,
                 background: floor === f ? T.orange : 'transparent',
                 color: floor === f ? '#fff' : T.inkMid,
@@ -503,10 +591,10 @@ function C_AisleMap({ pop, push }) {
             position: 'absolute', top: 60, left: 16, zIndex: 3, pointerEvents: 'none',
           }}>
             <div style={{ fontFamily: SANS, fontWeight: 900, fontSize: 22, color: T.inkMid, letterSpacing: '.04em', lineHeight: 1 }}>
-              FOOD HALL
+              {floorData.en}
             </div>
             <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 10, color: T.inkSoft, marginTop: 4, letterSpacing: '.2em' }}>
-              神戸三宮店 · 1F
+              神戸三宮店 · {floor}
             </div>
           </div>
 
@@ -542,28 +630,10 @@ function C_AisleMap({ pop, push }) {
             <path d="M 0 110 L 320 110 L 320 124 L 0 124 Z" fill="url(#aisleway)" opacity=".7"/>
             <path d="M 152 18 L 168 18 L 168 210 L 152 210 Z" fill="url(#aisleway)" opacity=".55"/>
 
-            {/* Section data */}
-            {[
-              // Top row: produce / fish / bakery
-              { id: 'produce',  x: 14,  y: 22,  w: 132, h: 80, l: '青果',       en: 'PRODUCE',  tint: '#e1ecc8', border: '#9bbd72', color: '#43652b', cats: ['food'] },
-              { id: 'fish',     x: 174, y: 22,  w: 80,  h: 80, l: '鮮魚',       en: 'SEAFOOD',  tint: '#d5e6f2', border: '#7ba6c5', color: '#1f4a6b', cats: ['food'] },
-              { id: 'bakery',   x: 262, y: 22,  w: 44,  h: 80, l: 'ベーカリー', en: 'BAKERY',   tint: '#f6e2c8', border: '#d4ae72', color: '#7a5320', cats: ['deli'] },
-              // Middle row: meat / center frozen-chilled / deli
-              { id: 'meat',     x: 14,  y: 130, w: 92,  h: 72, l: '精肉',       en: 'MEAT',     tint: '#fadcde', border: '#d6868c', color: '#8a2a30', cats: ['food'] },
-              { id: 'chilled',  x: 114, y: 130, w: 38,  h: 72, l: '冷蔵',       en: 'CHILLED',  tint: '#e3edf5', border: '#a8b9c8', color: '#3a4f60', cats: ['food'] },
-              { id: 'frozen',   x: 168, y: 130, w: 38,  h: 72, l: '冷凍',       en: 'FROZEN',   tint: '#d8e8f2', border: '#7da3bb', color: '#2a4658', cats: ['food'] },
-              { id: 'deli',     x: 214, y: 130, w: 44,  h: 36, l: '惣菜',       en: 'DELI',     tint: '#fde8d2', border: '#e0a86a', color: '#7a4520', cats: ['deli'] },
-              { id: 'sushi',    x: 214, y: 168, w: 44,  h: 34, l: '寿司',       en: 'SUSHI',    tint: '#fadcc8', border: '#dc9d6c', color: '#7a3a18', cats: ['deli'] },
-              { id: 'bento',    x: 264, y: 130, w: 42,  h: 36, l: '弁当',       en: 'BENTO',    tint: '#fde8d2', border: '#e0a86a', color: '#7a4520', cats: ['deli'] },
-              { id: 'pantry',   x: 264, y: 168, w: 42,  h: 34, l: '加工',       en: 'PANTRY',   tint: '#efe6d3', border: '#c8b990', color: '#5a4530', cats: ['food'] },
-              { id: 'dairy',    x: 14,  y: 206, w: 64,  h: 22, l: '日配',       en: 'DAIRY',    tint: '#fcebd2', border: '#d9a86a', color: '#7a5320', cats: ['food'] },
-              { id: 'rice',     x: 80,  y: 206, w: 30,  h: 22, l: '米',         en: 'RICE',     tint: '#f3eedd', border: '#c6a56c', color: '#5a4530', cats: ['food'] },
-              { id: 'liquor',   x: 112, y: 206, w: 70,  h: 22, l: '酒類・飲料', en: 'LIQUOR',   tint: '#f3e8d6', border: '#bda57a', color: '#5a4530', cats: ['liquor'] },
-              { id: 'register', x: 198, y: 206, w: 60,  h: 22, l: 'レジ',       en: 'CHECKOUT', tint: '#fff7e6', border: '#c6a56c', color: '#5a4530', cats: ['service'] },
-              { id: 'exit',     x: 264, y: 206, w: 42,  h: 22, l: '出口',       en: 'EXIT',     tint: '#fff', border: T.outlineSoft, color: T.inkMid, cats: ['service'] },
-            ].map((a, i) => {
-              const isStep = steps.some(s => s.aisle === a.l);
-              const stepIdx = steps.findIndex(s => s.aisle === a.l);
+            {/* Section data — floor-aware */}
+            {sections.map((a, i) => {
+              const isStep = showRoute && steps.some(s => s.aisle === a.l);
+              const stepIdx = showRoute ? steps.findIndex(s => s.aisle === a.l) : -1;
               const cur = stepIdx === step;
               const inFilter = filter === 'all' || a.cats.includes(filter);
               const fill = cur ? T.orange : a.tint;
@@ -600,61 +670,49 @@ function C_AisleMap({ pop, push }) {
               );
             })}
 
-            {/* Sale-item POI dots — pink */}
-            {[
-              { x: 60,  y: 60,  sec: 'produce' },
-              { x: 100, y: 80,  sec: 'produce' },
-              { x: 200, y: 50,  sec: 'fish' },
-              { x: 220, y: 80,  sec: 'fish' },
-              { x: 280, y: 60,  sec: 'bakery' },
-              { x: 40,  y: 150, sec: 'meat' },
-              { x: 70,  y: 175, sec: 'meat' },
-              { x: 135, y: 155, sec: 'chilled' },
-              { x: 188, y: 165, sec: 'frozen' },
-              { x: 235, y: 148, sec: 'deli' },
-              { x: 285, y: 148, sec: 'bento' },
-              { x: 235, y: 185, sec: 'sushi' },
-              { x: 40,  y: 218, sec: 'dairy' },
-              { x: 65,  y: 218, sec: 'dairy' },
-              { x: 145, y: 218, sec: 'liquor' },
-            ].map((p, i) => (
+            {/* Sale / POI dots — pink */}
+            {pois.map((p, i) => (
               <g key={i}>
                 <circle cx={p.x} cy={p.y} r="5" fill={T.point} opacity=".22"/>
                 <circle cx={p.x} cy={p.y} r="2.4" fill={T.point}/>
               </g>
             ))}
 
-            {/* Shopper path — entrance through current step */}
-            <path d="
-              M 50 234
-              L 50 218
-              L 50 165
-              L 50 60
-              L 80 60
-              L 200 60
-              L 280 60
-              L 280 110
-              L 220 117
-              L 80 117
-              L 50 130
-              L 50 165
-            "
-            stroke={T.orange} strokeWidth="2.6" strokeDasharray="5 4" fill="none"
-            strokeLinecap="round" strokeLinejoin="round" opacity=".82"/>
+            {showRoute && (
+              <>
+                {/* Shopper path — entrance through current step */}
+                <path d="
+                  M 50 234
+                  L 50 218
+                  L 50 165
+                  L 50 60
+                  L 80 60
+                  L 200 60
+                  L 280 60
+                  L 280 110
+                  L 220 117
+                  L 80 117
+                  L 50 130
+                  L 50 165
+                "
+                stroke={T.orange} strokeWidth="2.6" strokeDasharray="5 4" fill="none"
+                strokeLinecap="round" strokeLinejoin="round" opacity=".82"/>
 
-            {/* Entry marker */}
-            <g transform="translate(50, 234)">
-              <circle r="13" fill={T.fresh} opacity=".18"/>
-              <circle r="7" fill={T.fresh} stroke="#fff" strokeWidth="2"/>
-              <circle r="3" fill="#fff"/>
-            </g>
+                {/* Entry marker */}
+                <g transform="translate(50, 234)">
+                  <circle r="13" fill={T.fresh} opacity=".18"/>
+                  <circle r="7" fill={T.fresh} stroke="#fff" strokeWidth="2"/>
+                  <circle r="3" fill="#fff"/>
+                </g>
 
-            {/* Target pin on current step (meat) */}
-            <g transform="translate(50, 165)">
-              <ellipse cx="0" cy="14" rx="7" ry="2" fill={T.ink} opacity=".18"/>
-              <path d="M0 -16c-8 0-13 6-13 11c0 7 13 17 13 17s13-10 13-17c0-5-5-11-13-11z" fill={T.sale}/>
-              <circle cy="-4" r="4" fill="#fff"/>
-            </g>
+                {/* Target pin on current step (meat) */}
+                <g transform="translate(50, 165)">
+                  <ellipse cx="0" cy="14" rx="7" ry="2" fill={T.ink} opacity=".18"/>
+                  <path d="M0 -16c-8 0-13 6-13 11c0 7 13 17 13 17s13-10 13-17c0-5-5-11-13-11z" fill={T.sale}/>
+                  <circle cy="-4" r="4" fill="#fff"/>
+                </g>
+              </>
+            )}
           </svg>
 
           {/* Category filter chips — overlay at bottom */}
@@ -662,13 +720,7 @@ function C_AisleMap({ pop, push }) {
             position: 'absolute', bottom: 10, left: 10, right: 56, zIndex: 4,
             display: 'flex', gap: 6, overflowX: 'auto',
           }} className="oas-noscroll">
-            {[
-              { v: 'all',     l: 'すべて',     i: 'home' },
-              { v: 'food',    l: '食材',       i: 'leaf' },
-              { v: 'deli',    l: '惣菜・パン', i: 'flame' },
-              { v: 'liquor',  l: 'お酒・飲料', i: 'wine' },
-              { v: 'service', l: 'レジ・出口', i: 'pin' },
-            ].map((c) => {
+            {chips.map((c) => {
               const on = filter === c.v;
               return (
                 <button key={c.v} onClick={() => setFilter(c.v)} style={{
