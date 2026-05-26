@@ -1,41 +1,13 @@
-// Shared phone shell + common tab bar + status bar
-// White paper, standard Japanese supermarket app shape.
+// App shell (no more phone bezel) + common tab bar + safe-area constants.
 
-const SAFE_TOP = 50;
-const SAFE_BOT = 84;
+const SAFE_TOP = 0;
+const SAFE_BOT = 70;
 
-// ── Phone bezel ──────────────────────────────────────────────────
+// ── App shell — fills its responsive parent (.app-shell defined in Prototype.html)
 function PhoneBezel({ children, paper = '#ffffff' }) {
   return (
-    <div style={{
-      width: 390, height: 844, position: 'relative',
-      borderRadius: 48, overflow: 'hidden',
-      background: paper,
-      boxShadow: `0 0 0 10px #0e0e0e, 0 24px 70px rgba(0,0,0,.28)`,
-    }}>
-      {/* dynamic island */}
-      <div style={{
-        position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
-        width: 122, height: 36, borderRadius: 22, background: '#000', zIndex: 200,
-      }}/>
-      {/* status bar */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: 50, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '18px 32px 0', pointerEvents: 'none',
-      }}>
-        <span style={{ fontSize: 16, fontWeight: 700, fontFamily: '-apple-system, system-ui', color: T.ink }}>9:41</span>
-        <span style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-          <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6.5" width="3" height="4" rx=".5" fill={T.ink}/><rect x="4.5" y="4" width="3" height="6.5" rx=".5" fill={T.ink}/><rect x="9" y="1.5" width="3" height="9" rx=".5" fill={T.ink}/><rect x="13.5" y="-1" width="3" height="11.5" rx=".5" fill={T.ink}/></svg>
-          <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 3C9.4 3 11.1 3.7 12.4 4.8L13.3 4C11.7 2.6 9.7 1.7 7.5 1.7S3.3 2.6 1.7 4L2.6 4.8C3.9 3.7 5.6 3 7.5 3z" fill={T.ink}/><path d="M7.5 5.8c1.2 0 2.2.4 3 1.1l.9-.9C10.3 5.1 9 4.5 7.5 4.5S4.7 5.1 3.6 6l.9.9c.8-.7 1.8-1.1 3-1.1z" fill={T.ink}/><circle cx="7.5" cy="9" r="1.2" fill={T.ink}/></svg>
-          <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" fill="none" stroke={T.ink} strokeOpacity=".4"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={T.ink}/></svg>
-        </span>
-      </div>
-      <div style={{ position: 'absolute', inset: 0 }}>{children}</div>
-      <div style={{
-        position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)',
-        width: 130, height: 5, borderRadius: 5, background: 'rgba(0,0,0,.3)', zIndex: 300,
-      }}/>
+    <div className="app-shell" style={{ background: paper }}>
+      {children}
     </div>
   );
 }
@@ -129,7 +101,7 @@ function TabBar({ active, onChange, accent = T.orange }) {
   return (
     <div style={{
       position: 'absolute', left: 0, right: 0, bottom: 0,
-      paddingBottom: 22, paddingTop: 8,
+      paddingBottom: 'max(10px, env(safe-area-inset-bottom))', paddingTop: 8,
       background: '#fff',
       borderTop: `1px solid ${T.outlineSoft}`,
       display: 'flex', zIndex: 40,
