@@ -78,6 +78,7 @@ const MONO    = `"JetBrains Mono", ui-monospace, "SF Mono", monospace`;
     .oas-noscroll { scrollbar-width: none; }
     @keyframes oasFadeIn { from { opacity: 0 } to { opacity: 1 } }
     @keyframes oasSlideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+    @keyframes oasTypeDot { 0%,80%,100% { opacity: .25; transform: translateY(0) } 40% { opacity: 1; transform: translateY(-2px) } }
   `;
   document.head.appendChild(s);
 })();

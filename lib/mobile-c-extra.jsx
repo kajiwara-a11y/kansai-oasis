@@ -6,11 +6,92 @@
 // ─────────────────────────────────────────────────────────────
 // AI CHAT — full screen
 // ─────────────────────────────────────────────────────────────
+// Local "AI" reply engine — keyword-pattern matching against a known set
+// of products / questions for the Hankyu OASIS context. Returns a string.
+const _OASIS_RULES = [
+  { pat: /(親子丼|おやこどん)/i, r: 'ふんわり親子丼ですね。特売の鶏もも肉(¥398)と兵庫朝採卵(¥178)で、15分・4人前 ¥1,180 で作れます。買い物リストにまとめましょうか？' },
+  { pat: /(鶏もも|とりもも|チキン)/i, r: '鶏もも肉は本日 ¥398(通常 ¥598、−33%)。親子丼・唐揚げ・照り焼きが特売を活かす定番です。' },
+  { pat: /(鮭|サーモン|さけ)/i, r: '鮮魚 F-2(入口から 22m)に 北海道産 銀鮭 2切 ¥498(−28%)があります。塩焼き・ムニエル・ホイル焼きがおすすめ。' },
+  { pat: /(卵|たまご)/i, r: '兵庫朝採卵 10個入 ¥178 が特売です。クーポン適用でさらに ¥50 OFF。親子丼や卵焼きにぴったり。' },
+  { pat: /(玉ねぎ|たまねぎ)/i, r: '玉ねぎ 3個 ¥198 が青果コーナー A-3 にあります。親子丼にも肉じゃがにも使えます。' },
+  { pat: /肉じゃが/i, r: '肉じゃがは 30分・4人前で約 ¥1,400。牛切落し ¥698 と玉ねぎ ¥198 が特売中です。' },
+  { pat: /(味噌汁|みそ汁|スープ)/i, r: 'お味噌汁は 5分で完成。木綿豆腐 ¥88 と三つ葉 ¥128 が日配コーナー C-2 に。' },
+  { pat: /(キャベツ|きゃべつ)/i, r: '春キャベツ 1玉 ¥98(−38%)、青果 A-1 にあります。サラダや浅漬け、お好み焼きにどうぞ。' },
+  { pat: /(牛乳|ミルク)/i, r: '北海道牛乳 1L ¥198(クーポン適用で ¥118)、日配 C-1 に。冷蔵保管 4℃ 推奨です。' },
+  { pat: /(パン|食パン|メロンパン)/i, r: '神戸ベーカリー食パン 6枚 ¥248 が人気。メロンパンは 17:00 焼上りで、夕方の補充タイミングがおすすめです。' },
+  { pat: /(りんご|林檎|アップル)/i, r: 'りんご 3個 ¥380(−21%)、青果 A-4 に。サラダにも、デザートにもどうぞ。' },
+  { pat: /(豆腐|とうふ)/i, r: '木綿豆腐 300g ¥88(−31%)、日配 C-2 にあります。麻婆豆腐・冷奴・お味噌汁に。' },
+  { pat: /(寿司|すし|刺身|サシミ)/i, r: '握り寿司 12貫(本まぐろ入)¥980(−23%)、刺身盛合せ 3点 ¥698 が鮮魚 F-1 に。' },
+  { pat: /(豚|ポーク|とん)/i, r: '豚バラ薄切 300g ¥498(−27%)、精肉 B-1 に。豚汁や生姜焼きに使えます。' },
+  { pat: /(牛|ビーフ|ぎゅう)/i, r: '牛切落し 300g ¥698(−29%)、精肉 B-2 に。すき焼き・牛丼・肉じゃが向きです。' },
+  { pat: /予算|円で|円以内|円まで|いくら/i, r: (t) => {
+      const m = t.match(/(\d[\d,]*)/);
+      const yen = m ? parseInt(m[1].replace(/,/g, '')) : 2000;
+      if (yen <= 1200) return `${yen.toLocaleString()}円なら、塩鮭の塩焼き定食(¥1,200) または うどん+卵で ¥800 程度がぴったりです。`;
+      if (yen <= 1800) return `${yen.toLocaleString()}円なら、親子丼 単品(¥1,180) + サラダ(¥600) で収まります。`;
+      if (yen <= 2500) return `${yen.toLocaleString()}円なら、親子丼 + 味噌汁 + サラダ(¥1,820) がぴったり。クーポン適用で ¥1,750 になります。`;
+      return `${yen.toLocaleString()}円なら、肉じゃが + 鮭の塩焼き + サラダ(¥2,800) と豪華に組めます。`;
+    }
+  },
+  { pat: /(節約|安い|お得|お買い得|セール|特売)/i, r: '本日の特売3品: 鶏もも肉 ¥398、兵庫朝採卵 ¥178、春キャベツ ¥98。組合せれば 4人家族の晩ごはん 1食 ¥1,200 以内も可能です。' },
+  { pat: /(子ども|こども|子供|キッズ|園児)/i, r: 'お子様向けなら、メロンパン(17:00 焼上り) + 北海道牛乳 ¥198。または 三色丼弁当 ¥540 もおすすめ。' },
+  { pat: /(時短|早い|簡単|短時間|忙しい)/i, r: '時短メニュー: 親子丼 15分 ¥1,180 / 塩鮭の塩焼き 10分 ¥1,200 / 味噌汁 5分 ¥80。すべて特売食材で作れます。' },
+  { pat: /(ヘルシー|健康|野菜|サラダ|ダイエット|低カロリー)/i, r: '彩り野菜サラダ(8分・180kcal・¥600)はいかがでしょう。春キャベツ ¥98 とトマト ¥298 が特売中です。' },
+  { pat: /(冷蔵庫|余り物|残り物|あまりもの)/i, r: '冷蔵庫の食材を教えてください。卵・玉ねぎ・鶏肉・キャベツ あたりがあれば 親子丼・お好み焼き・親子煮にできます。' },
+  { pat: /(献立|こんだて|メニュー|何作る|なに作る)/i, r: '今夜のおすすめ: ① 親子丼 ¥1,180 ② 肉じゃが ¥1,400 ③ 鮭の塩焼き ¥1,200。どれも特売食材で 30分以内に。' },
+  { pat: /(店内|売場|うりば|どこ|場所|どこに|どこある)/i, r: '商品名を教えてください。神戸三宮店内の棚番(例: F-2)と入口からの距離をお調べします。' },
+  { pat: /(クーポン|割引)/i, r: '本日 5 枚のクーポンが配信中(¥420 お得)。兵庫朝採卵 ¥50 OFF と 北海道牛乳 ¥80 OFF が人気です。' },
+  { pat: /(ポイント|s\s?point)/i, r: '現在 1,248 S ポイント保有中。今月の購入額 ¥18,420、ゴールド継続まであと ¥1,580 です。' },
+  { pat: /(配達|宅配|デリバリー|キッチンエール|宅配便)/i, r: '阪急キッチンエール: 本日 14:00 までのご注文で当日 18:00 までお届け可能です。' },
+  { pat: /(営業|何時|閉店|オープン)/i, r: '神戸三宮店は 9:00 — 22:00 営業(年末年始は変更あり)。チラシは毎週 水・土・日 更新です。' },
+  { pat: /(別|ほか|他|もうひとつ|もう一つ)/i, r: '別案: 豚バラ薄切 ¥498 を使った豚汁定食(¥1,400)、または 刺身盛合せ ¥698 で和定食(¥1,500) はいかがでしょう。' },
+  { pat: /(ありがとう|サンキュー|thanks|どうも)/i, r: 'お役に立てて嬉しいです。他にも献立や売場の質問があればいつでもどうぞ。' },
+  { pat: /(こんにちは|こんばんは|はじめまして|よろしく|もしもし|おはよう)/i, r: 'こんにちは、田中さん！今日は何をお探しですか？本日のおすすめは 鶏もも肉(¥398) と 兵庫朝採卵(¥178) です。' },
+];
+function oasisLocalReply(text) {
+  for (const { pat, r } of _OASIS_RULES) {
+    if (pat.test(text)) return typeof r === 'function' ? r(text) : r;
+  }
+  const fallbacks = [
+    'なるほど。もう少し詳しく教えてもらえますか？(例: 食材名、予算、人数など)',
+    'もう少し情報をいただけますか？「親子丼を作りたい」「予算 2000 円」のような形で教えてください。',
+    '本日の特売は 鶏もも肉 ¥398、兵庫朝採卵 ¥178、春キャベツ ¥98 です。気になる食材から検索しますか？',
+  ];
+  return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+}
+
 function C_AiChat({ pop, push }) {
   const [input, setInput] = React.useState('');
-  const [chatResetKey, setChatResetKey] = React.useState(0);
   const [altCount, setAltCount] = React.useState(0);
+  const [extras, setExtras] = React.useState([]); // dynamic messages appended after the canned demo
+  const [typing, setTyping] = React.useState(false);
+  const scrollRef = React.useRef(null);
   const suggestions = ['今夜の献立は？', '鶏もも肉を使うレシピ', '冷蔵庫の余り物で', '子どもが喜ぶおかず'];
+
+  const send = (text) => {
+    const t = (text ?? input).trim();
+    if (!t || typing) return;
+    setInput('');
+    setExtras(es => [...es, { who: 'me', text: t }]);
+    setTyping(true);
+    const delay = 500 + Math.min(t.length * 18, 900);
+    setTimeout(() => {
+      setExtras(es => [...es, { who: 'ai', text: oasisLocalReply(t) }]);
+      setTyping(false);
+    }, delay);
+  };
+
+  const reset = () => {
+    setExtras([]);
+    setAltCount(0);
+    setInput('');
+  };
+
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [extras, typing]);
+
   return (
     <div style={{ height: '100%', background: T.bg, display: 'flex', flexDirection: 'column' }}>
       {/* Custom dark header */}
@@ -38,7 +119,7 @@ function C_AiChat({ pop, push }) {
               神戸三宮店の在庫を参照中
             </div>
           </div>
-          <button onClick={() => setChatResetKey(k => k + 1)} style={{
+          <button onClick={reset} title="会話をリセット" style={{
             width: 36, height: 36, border: 0, background: 'rgba(255,255,255,.12)', cursor: 'pointer',
             borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}><Icon name="refresh" size={16} color="#fff"/></button>
@@ -46,7 +127,7 @@ function C_AiChat({ pop, push }) {
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '18px 16px 8px' }} className="oas-noscroll">
+      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '18px 16px 8px' }} className="oas-noscroll">
         <ChatBubble who="ai">
           <span style={{ fontWeight: 700 }}>こんにちは、田中さん！</span><br/>
           今日の三宮店では <strong style={{ color: T.sale }}>鶏もも肉 (¥398)</strong> と <strong style={{ color: T.sale }}>兵庫の朝採卵 (¥178)</strong> がお買い得です。
@@ -112,22 +193,46 @@ function C_AiChat({ pop, push }) {
             background: T.orange, color: '#fff', cursor: 'pointer',
             fontFamily: SANS, fontWeight: 700, fontSize: 11.5,
           }}>買い物リストに追加</button>
-          <button onClick={() => setAltCount(n => n + 1)} style={{
+          <button onClick={() => { setAltCount(n => n + 1); send('別の献立案'); }} style={{
             padding: '8px 14px', borderRadius: 99, border: `1px solid ${T.outline}`,
             background: '#fff', color: T.ink, cursor: 'pointer',
             fontFamily: SANS, fontWeight: 600, fontSize: 11.5,
           }}>別の提案 {altCount > 0 ? '· ' + altCount : ''}</button>
         </div>
+
+        {/* Dynamic message log */}
+        {extras.map((m, i) => (
+          <ChatBubble key={i} who={m.who}>{m.text}</ChatBubble>
+        ))}
+        {typing && (
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 14 }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: 999, background: T.orange,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+              boxShadow: '0 2px 6px rgba(46,133,64,.35)',
+            }}><Icon name="sparkleF" size={14} color="#fff"/></div>
+            <div style={{
+              background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 16,
+              borderBottomLeftRadius: 4, padding: '10px 14px',
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+            }}>
+              <span className="oas-typedot" style={{ width: 6, height: 6, borderRadius: 99, background: T.inkMute, animation: 'oasTypeDot 1s infinite' }}/>
+              <span className="oas-typedot" style={{ width: 6, height: 6, borderRadius: 99, background: T.inkMute, animation: 'oasTypeDot 1s infinite .15s' }}/>
+              <span className="oas-typedot" style={{ width: 6, height: 6, borderRadius: 99, background: T.inkMute, animation: 'oasTypeDot 1s infinite .3s' }}/>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Suggestion chips */}
       <div style={{ padding: '8px 16px', display: 'flex', gap: 6, overflowX: 'auto', borderTop: `1px solid ${T.outlineSoft}`, background: '#fff' }} className="oas-noscroll">
         {suggestions.map((s) => (
-          <button key={s} onClick={() => setInput(s)} style={{
+          <button key={s} onClick={() => send(s)} disabled={typing} style={{
             flex: '0 0 auto', padding: '6px 12px', borderRadius: 99,
             background: T.paperAlt, border: `1px solid ${T.outline}`,
-            color: T.ink, cursor: 'pointer',
+            color: T.ink, cursor: typing ? 'default' : 'pointer',
             fontFamily: SANS, fontWeight: 600, fontSize: 11,
+            opacity: typing ? .5 : 1,
           }}>{s}</button>
         ))}
       </div>
@@ -139,17 +244,22 @@ function C_AiChat({ pop, push }) {
           display: 'flex', alignItems: 'center', gap: 8,
           border: `1px solid ${T.outline}`,
         }}>
-          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="メッセージを入力…" style={{
-            flex: 1, border: 0, background: 'transparent', outline: 'none',
-            fontFamily: SANS, fontSize: 13, color: T.ink,
-          }}/>
-          <button onClick={() => setInput('鶏もも肉を使う節約レシピを教えて')} style={{
+          <input value={input}
+                 onChange={(e) => setInput(e.target.value)}
+                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+                 placeholder="メッセージを入力…"
+                 style={{
+                   flex: 1, border: 0, background: 'transparent', outline: 'none',
+                   fontFamily: SANS, fontSize: 13, color: T.ink,
+                 }}/>
+          <button onClick={() => setInput('鶏もも肉を使う節約レシピを教えて')} title="音声入力(デモ: テキスト挿入)" style={{
             width: 32, height: 32, borderRadius: 999, background: 'transparent', border: 0, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}><Icon name="mic" size={18} color={T.inkMid}/></button>
-          <button onClick={() => setInput('')} style={{
-            width: 32, height: 32, borderRadius: 999, background: input ? T.orange : T.outline, color: '#fff',
-            border: 0, cursor: input ? 'pointer' : 'default',
+          <button onClick={() => send()} disabled={!input.trim() || typing} style={{
+            width: 32, height: 32, borderRadius: 999,
+            background: (input.trim() && !typing) ? T.orange : T.outline, color: '#fff',
+            border: 0, cursor: (input.trim() && !typing) ? 'pointer' : 'default',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'background .15s',
           }}>
