@@ -413,15 +413,26 @@ function C_Notif({ pop, push }) {
   const [allRead, setAllRead] = React.useState(false);
   const groups = [
     { d: '今日', list: [
-      { t: 17, m: 'タイムセール開始 · お惣菜が最大 20% OFF', tag: '特売', tagTone: 'sale', i: 'flame', ai: true, go: 'flyer' },
-      { t: 9,  m: '田中さんへ · 鶏もも肉が本日のおすすめです', tag: 'AI',  tagTone: 'orange',  i: 'sparkleF', ai: true, go: 'ai-chat' },
+      { t: 17, m: 'タイムセール開始 · お惣菜が最大 20% OFF', tag: '特売', tagTone: 'sale', i: 'flame', ai: true,
+        view: 'flyer' },
+      { t: 9,  m: '田中さんへ · 鶏もも肉が本日のおすすめです', tag: 'AI', tagTone: 'orange', i: 'sparkleF', ai: true,
+        view: 'product', data: { name: '国産 鶏もも肉', sub: '300g', price: 398, was: 598, kind: 'chicken' } },
+      { t: 7,  m: 'AI 献立 · 今夜は ふんわり親子丼 はいかがでしょう', tag: 'レシピ', tagTone: 'orangeSoft', i: 'book', ai: true,
+        view: 'recipe-detail', data: { id: 'oyakodon' } },
     ]},
     { d: '昨日', list: [
-      { t: '15:30', m: 'クーポン「兵庫朝採卵 ¥50OFF」を獲得しました', tag: 'クーポン', tagTone: 'pointSoft', i: 'coupon', go: 'coupon' },
-      { t: '11:00', m: '北海道フェア 開催のお知らせ',                  tag: 'イベント', tagTone: 'orangeSoft', i: 'gift', go: 'flyer' },
+      { t: '15:30', m: 'クーポン「兵庫朝採卵 ¥50OFF」を獲得しました', tag: 'クーポン', tagTone: 'pointSoft', i: 'coupon',
+        view: 'coupon' },
+      { t: '11:00', m: '北海道フェア 開催のお知らせ', tag: 'イベント', tagTone: 'orangeSoft', i: 'gift',
+        view: 'flyer' },
+      { t: '08:30', m: '買い物リストの玉ねぎが特売価格になりました', tag: 'リスト', tagTone: 'fresh', i: 'cart',
+        view: 'shopping-list' },
     ]},
     { d: '11/24', list: [
-      { t: '18:00', m: '年末年始の営業時間について',                   tag: '重要', tagTone: 'sale', i: 'info', go: 'contact' },
+      { t: '18:00', m: '年末年始の営業時間について', tag: '重要', tagTone: 'sale', i: 'info',
+        view: 'contact' },
+      { t: '12:00', m: 'S ポイント 280 pt の有効期限が来月末です', tag: 'ポイント', tagTone: 'pointSoft', i: 'point',
+        view: 'mypage' },
     ]},
   ];
   return (
@@ -436,7 +447,7 @@ function C_Notif({ pop, push }) {
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 800, color: T.inkSoft, letterSpacing: '.2em', margin: '8px 4px' }}>{g.d}</div>
             <div style={{ background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 12, overflow: 'hidden' }}>
               {g.list.map((n, i) => (
-                <button key={i} onClick={() => n.go && push && push(n.go)} style={{
+                <button key={i} onClick={() => n.view && push && push(n.view, n.data)} style={{
                   width: '100%', padding: '12px 14px', display: 'flex', gap: 10,
                   borderTop: i ? `1px solid ${T.outlineSoft}` : 'none',
                   border: 'none', background: '#fff', cursor: 'pointer',
