@@ -405,6 +405,8 @@ function C_ShoppingList({ pop, push }) {
 function C_AisleMap({ pop, push }) {
   const [step, setStep] = React.useState(2);
   const [done, setDone] = React.useState(false);
+  const [floor, setFloor] = React.useState('1F');
+  const [filter, setFilter] = React.useState('all');
   const steps = [
     { aisle: '青果',  it: '玉ねぎ + 三つ葉', dist: '0m',  pos: { x: 30, y: 60 } },
     { aisle: '精肉',  it: '鶏もも肉',        dist: '32m', pos: { x: 130, y: 35 } },
@@ -446,58 +448,151 @@ function C_AisleMap({ pop, push }) {
       {/* Map */}
       <div style={{ flex: 1, padding: '14px 16px 0', minHeight: 0 }}>
         <div style={{
-          background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 14,
-          height: '100%', padding: 14, position: 'relative', overflow: 'hidden',
+          background: '#fbf7ef', border: `1px solid ${T.outline}`, borderRadius: 16,
+          height: '100%', padding: 0, position: 'relative', overflow: 'hidden',
+          boxShadow: 'inset 0 0 0 1px rgba(40,30,10,.03)',
         }}>
-          <svg viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet" style={{ width: '100%', height: '100%' }}>
+          {/* Floor selector — right edge */}
+          <div style={{
+            position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', zIndex: 5,
+            display: 'flex', flexDirection: 'column', gap: 4,
+            background: '#fff', borderRadius: 10, padding: 4,
+            boxShadow: '0 4px 12px rgba(40,30,10,.12)',
+            border: `1px solid ${T.outlineSoft}`,
+          }}>
+            {['2F', '1F', 'B1'].map((f) => (
+              <button key={f} onClick={() => setFloor(f)} style={{
+                width: 32, height: 32, borderRadius: 7,
+                background: floor === f ? T.orange : 'transparent',
+                color: floor === f ? '#fff' : T.inkMid,
+                border: 0, cursor: 'pointer',
+                fontFamily: NUM, fontWeight: 900, fontSize: 12,
+                boxShadow: floor === f ? '0 2px 6px rgba(46,133,64,.35)' : 'none',
+              }}>{f}</button>
+            ))}
+          </div>
+
+          {/* Top chrome — floor title + search + nearby pill */}
+          <div style={{
+            position: 'absolute', top: 10, left: 10, right: 56, zIndex: 4,
+            display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <button style={{
+              background: '#fff', border: `1px solid ${T.outlineSoft}`, borderRadius: 99,
+              padding: '8px 12px', cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontFamily: SANS, fontWeight: 700, fontSize: 11, color: T.ink,
+              boxShadow: '0 2px 6px rgba(40,30,10,.06)',
+            }}>
+              <Icon name="pin" size={13} color={T.fresh}/>
+              現在地から探す
+            </button>
+            <div style={{ flex: 1 }}/>
+            <button onClick={() => push('search')} style={{
+              width: 36, height: 36, borderRadius: 999,
+              background: '#fff', border: `1px solid ${T.outlineSoft}`, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 2px 6px rgba(40,30,10,.06)',
+            }}>
+              <Icon name="search" size={16} color={T.inkMid}/>
+            </button>
+          </div>
+
+          {/* Floor brand */}
+          <div style={{
+            position: 'absolute', top: 60, left: 16, zIndex: 3, pointerEvents: 'none',
+          }}>
+            <div style={{ fontFamily: SANS, fontWeight: 900, fontSize: 22, color: T.inkMid, letterSpacing: '.04em', lineHeight: 1 }}>
+              FOOD HALL
+            </div>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 10, color: T.inkSoft, marginTop: 4, letterSpacing: '.2em' }}>
+              神戸三宮店 · 1F
+            </div>
+          </div>
+
+          {/* Help button bottom-right */}
+          <button style={{
+            position: 'absolute', bottom: 56, right: 10, zIndex: 4,
+            width: 30, height: 30, borderRadius: 999,
+            background: '#fff', border: `1px solid ${T.outlineSoft}`, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: NUM, fontWeight: 800, fontSize: 14, color: T.inkMid,
+            boxShadow: '0 2px 6px rgba(40,30,10,.06)',
+          }}>?</button>
+
+          <svg viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet" style={{ width: '100%', height: '100%', display: 'block' }}>
             <defs>
-              <pattern id="floorDots" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-                <circle cx="5" cy="5" r=".6" fill={T.outline} opacity=".7"/>
+              <pattern id="floorTexture" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+                <rect width="6" height="6" fill="#fbf7ef"/>
+                <circle cx="3" cy="3" r=".35" fill="#d8cdb4" opacity=".5"/>
               </pattern>
-              <filter id="aisleShadow" x="-10%" y="-10%" width="120%" height="120%">
-                <feDropShadow dx="0" dy="1" stdDeviation=".8" floodOpacity=".06"/>
+              <filter id="sectionShadow" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="1.2" stdDeviation="1" floodOpacity=".09"/>
               </filter>
+              <linearGradient id="aisleway" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#f5ead5"/>
+                <stop offset="100%" stopColor="#f0e2c4"/>
+              </linearGradient>
             </defs>
 
-            {/* Floor */}
-            <rect x="0" y="0" width="320" height="240" fill="url(#floorDots)"/>
+            {/* Floor base */}
+            <rect x="0" y="0" width="320" height="240" fill="url(#floorTexture)"/>
 
-            {/* Aisles */}
+            {/* Main aisleway corridors */}
+            <path d="M 0 110 L 320 110 L 320 124 L 0 124 Z" fill="url(#aisleway)" opacity=".7"/>
+            <path d="M 152 18 L 168 18 L 168 210 L 152 210 Z" fill="url(#aisleway)" opacity=".55"/>
+
+            {/* Section data */}
             {[
-              { x: 10,  y: 18,  w: 96,  h: 44, l: '青果',       tint: '#e6f1d9', border: '#9bbd72', color: '#43652b' },
-              { x: 112, y: 18,  w: 96,  h: 44, l: '精肉',       tint: '#fadcde', border: '#d6868c', color: '#8a2a30' },
-              { x: 214, y: 18,  w: 96,  h: 44, l: '鮮魚',       tint: '#d5e6f2', border: '#7ba6c5', color: '#1f4a6b' },
-              { x: 10,  y: 70,  w: 70,  h: 80, l: '日配',       tint: '#fcebd2', border: '#d9a86a', color: '#7a5320' },
-              { x: 86,  y: 70,  w: 62,  h: 80, l: '冷蔵' },
-              { x: 154, y: 70,  w: 62,  h: 80, l: '冷凍' },
-              { x: 222, y: 70,  w: 88,  h: 38, l: '惣菜' },
-              { x: 222, y: 112, w: 88,  h: 38, l: 'ベーカリー' },
-              { x: 10,  y: 158, w: 140, h: 32, l: '酒類 · 飲料' },
-              { x: 156, y: 158, w: 92,  h: 32, l: 'レジ',       tint: '#f3eedd', border: '#c6a56c', color: '#5a4530', special: true },
-              { x: 254, y: 158, w: 56,  h: 32, l: '出口',       tint: '#fff', border: T.outline, color: T.inkMid, special: true },
+              // Top row: produce / fish / bakery
+              { id: 'produce',  x: 14,  y: 22,  w: 132, h: 80, l: '青果',       en: 'PRODUCE',  tint: '#e1ecc8', border: '#9bbd72', color: '#43652b', cats: ['food'] },
+              { id: 'fish',     x: 174, y: 22,  w: 80,  h: 80, l: '鮮魚',       en: 'SEAFOOD',  tint: '#d5e6f2', border: '#7ba6c5', color: '#1f4a6b', cats: ['food'] },
+              { id: 'bakery',   x: 262, y: 22,  w: 44,  h: 80, l: 'ベーカリー', en: 'BAKERY',   tint: '#f6e2c8', border: '#d4ae72', color: '#7a5320', cats: ['deli'] },
+              // Middle row: meat / center frozen-chilled / deli
+              { id: 'meat',     x: 14,  y: 130, w: 92,  h: 72, l: '精肉',       en: 'MEAT',     tint: '#fadcde', border: '#d6868c', color: '#8a2a30', cats: ['food'] },
+              { id: 'chilled',  x: 114, y: 130, w: 38,  h: 72, l: '冷蔵',       en: 'CHILLED',  tint: '#e3edf5', border: '#a8b9c8', color: '#3a4f60', cats: ['food'] },
+              { id: 'frozen',   x: 168, y: 130, w: 38,  h: 72, l: '冷凍',       en: 'FROZEN',   tint: '#d8e8f2', border: '#7da3bb', color: '#2a4658', cats: ['food'] },
+              { id: 'deli',     x: 214, y: 130, w: 44,  h: 36, l: '惣菜',       en: 'DELI',     tint: '#fde8d2', border: '#e0a86a', color: '#7a4520', cats: ['deli'] },
+              { id: 'sushi',    x: 214, y: 168, w: 44,  h: 34, l: '寿司',       en: 'SUSHI',    tint: '#fadcc8', border: '#dc9d6c', color: '#7a3a18', cats: ['deli'] },
+              { id: 'bento',    x: 264, y: 130, w: 42,  h: 36, l: '弁当',       en: 'BENTO',    tint: '#fde8d2', border: '#e0a86a', color: '#7a4520', cats: ['deli'] },
+              { id: 'pantry',   x: 264, y: 168, w: 42,  h: 34, l: '加工',       en: 'PANTRY',   tint: '#efe6d3', border: '#c8b990', color: '#5a4530', cats: ['food'] },
+              { id: 'dairy',    x: 14,  y: 206, w: 64,  h: 22, l: '日配',       en: 'DAIRY',    tint: '#fcebd2', border: '#d9a86a', color: '#7a5320', cats: ['food'] },
+              { id: 'rice',     x: 80,  y: 206, w: 30,  h: 22, l: '米',         en: 'RICE',     tint: '#f3eedd', border: '#c6a56c', color: '#5a4530', cats: ['food'] },
+              { id: 'liquor',   x: 112, y: 206, w: 70,  h: 22, l: '酒類・飲料', en: 'LIQUOR',   tint: '#f3e8d6', border: '#bda57a', color: '#5a4530', cats: ['liquor'] },
+              { id: 'register', x: 198, y: 206, w: 60,  h: 22, l: 'レジ',       en: 'CHECKOUT', tint: '#fff7e6', border: '#c6a56c', color: '#5a4530', cats: ['service'] },
+              { id: 'exit',     x: 264, y: 206, w: 42,  h: 22, l: '出口',       en: 'EXIT',     tint: '#fff', border: T.outlineSoft, color: T.inkMid, cats: ['service'] },
             ].map((a, i) => {
               const isStep = steps.some(s => s.aisle === a.l);
               const stepIdx = steps.findIndex(s => s.aisle === a.l);
               const cur = stepIdx === step;
-              const fill = cur ? T.orange : (isStep ? a.tint : (a.tint || '#fafaf6'));
-              const stroke = cur ? T.orangeDeep : (isStep ? a.border : (a.border || T.outlineSoft));
-              const textColor = cur ? '#fff' : (isStep ? a.color : (a.color || T.inkSoft));
+              const inFilter = filter === 'all' || a.cats.includes(filter);
+              const fill = cur ? T.orange : a.tint;
+              const stroke = cur ? T.orangeDeep : a.border;
+              const textColor = cur ? '#fff' : a.color;
               return (
-                <g key={i} filter="url(#aisleShadow)">
-                  <rect x={a.x} y={a.y} width={a.w} height={a.h} rx="4" ry="4"
+                <g key={i} filter="url(#sectionShadow)" opacity={inFilter ? 1 : 0.35}>
+                  <rect x={a.x} y={a.y} width={a.w} height={a.h} rx="3" ry="3"
                         fill={fill} stroke={stroke}
                         strokeWidth={cur ? 1.8 : 1}/>
-                  <text x={a.x + a.w/2} y={a.y + a.h/2 + 3.5} textAnchor="middle"
-                        fontFamily={SANS}
-                        fontWeight={cur || isStep ? 800 : 700}
-                        fontSize={a.l.length >= 5 ? 9 : 11.5}
-                        letterSpacing=".04em"
-                        fill={textColor}>{a.l}</text>
+                  {a.h >= 40 ? (
+                    <>
+                      <text x={a.x + a.w/2} y={a.y + a.h/2 - 2} textAnchor="middle"
+                            fontFamily={SANS} fontWeight="900" fontSize="12"
+                            letterSpacing=".05em" fill={textColor}>{a.l}</text>
+                      <text x={a.x + a.w/2} y={a.y + a.h/2 + 11} textAnchor="middle"
+                            fontFamily={NUM} fontWeight="600" fontSize="6.5"
+                            letterSpacing=".18em" fill={textColor} opacity=".65">{a.en}</text>
+                    </>
+                  ) : (
+                    <text x={a.x + a.w/2} y={a.y + a.h/2 + 3.5} textAnchor="middle"
+                          fontFamily={SANS} fontWeight="800" fontSize={a.l.length >= 5 ? 9 : 10.5}
+                          letterSpacing=".04em" fill={textColor}>{a.l}</text>
+                  )}
                   {isStep && (
-                    <g transform={`translate(${a.x + a.w - 11},${a.y + 11})`}>
-                      <circle r="9" fill={cur ? '#fff' : T.brand} stroke={cur ? T.brand : 'none'} strokeWidth="1.5"/>
-                      <text textAnchor="middle" y="3.5"
-                            fontFamily={NUM} fontWeight="900" fontSize="11"
+                    <g transform={`translate(${a.x + 12},${a.y + 12})`}>
+                      <circle r="10" fill={cur ? '#fff' : T.brand} stroke={cur ? T.brand : 'none'} strokeWidth="2"/>
+                      <text textAnchor="middle" y="4"
+                            fontFamily={NUM} fontWeight="900" fontSize="12"
                             fill={cur ? T.brand : '#fff'}>{stepIdx + 1}</text>
                     </g>
                   )}
@@ -505,39 +600,90 @@ function C_AisleMap({ pop, push }) {
               );
             })}
 
-            {/* Path — entrance → 青果 → 精肉 → 鮮魚 → (back to) 日配 (current) */}
-            <path d="
-              M 50 222
-              L 50 200
-              L 50 64
-              L 50 40
-              L 160 40
-              L 262 40
-              L 262 62
-              L 262 130
-              L 220 130
-              L 80 130
-              L 50 130
-              L 45 100
-            "
-            stroke={T.orange} strokeWidth="2.4" strokeDasharray="5 4" fill="none"
-            strokeLinecap="round" strokeLinejoin="round" opacity=".85"/>
+            {/* Sale-item POI dots — pink */}
+            {[
+              { x: 60,  y: 60,  sec: 'produce' },
+              { x: 100, y: 80,  sec: 'produce' },
+              { x: 200, y: 50,  sec: 'fish' },
+              { x: 220, y: 80,  sec: 'fish' },
+              { x: 280, y: 60,  sec: 'bakery' },
+              { x: 40,  y: 150, sec: 'meat' },
+              { x: 70,  y: 175, sec: 'meat' },
+              { x: 135, y: 155, sec: 'chilled' },
+              { x: 188, y: 165, sec: 'frozen' },
+              { x: 235, y: 148, sec: 'deli' },
+              { x: 285, y: 148, sec: 'bento' },
+              { x: 235, y: 185, sec: 'sushi' },
+              { x: 40,  y: 218, sec: 'dairy' },
+              { x: 65,  y: 218, sec: 'dairy' },
+              { x: 145, y: 218, sec: 'liquor' },
+            ].map((p, i) => (
+              <g key={i}>
+                <circle cx={p.x} cy={p.y} r="5" fill={T.point} opacity=".22"/>
+                <circle cx={p.x} cy={p.y} r="2.4" fill={T.point}/>
+              </g>
+            ))}
 
-            {/* Entry label */}
-            <g transform="translate(50, 222)">
-              <circle r="15" fill={T.fresh} opacity=".15"/>
+            {/* Shopper path — entrance through current step */}
+            <path d="
+              M 50 234
+              L 50 218
+              L 50 165
+              L 50 60
+              L 80 60
+              L 200 60
+              L 280 60
+              L 280 110
+              L 220 117
+              L 80 117
+              L 50 130
+              L 50 165
+            "
+            stroke={T.orange} strokeWidth="2.6" strokeDasharray="5 4" fill="none"
+            strokeLinecap="round" strokeLinejoin="round" opacity=".82"/>
+
+            {/* Entry marker */}
+            <g transform="translate(50, 234)">
+              <circle r="13" fill={T.fresh} opacity=".18"/>
               <circle r="7" fill={T.fresh} stroke="#fff" strokeWidth="2"/>
               <circle r="3" fill="#fff"/>
-              <text x="20" y="3" fontFamily={SANS} fontWeight="700" fontSize="9" fill={T.fresh}>入口</text>
             </g>
 
-            {/* Target pin on current step */}
-            <g transform="translate(45, 100)">
-              <ellipse cx="0" cy="14" rx="6" ry="2" fill={T.ink} opacity=".15"/>
+            {/* Target pin on current step (meat) */}
+            <g transform="translate(50, 165)">
+              <ellipse cx="0" cy="14" rx="7" ry="2" fill={T.ink} opacity=".18"/>
               <path d="M0 -16c-8 0-13 6-13 11c0 7 13 17 13 17s13-10 13-17c0-5-5-11-13-11z" fill={T.sale}/>
               <circle cy="-4" r="4" fill="#fff"/>
             </g>
           </svg>
+
+          {/* Category filter chips — overlay at bottom */}
+          <div style={{
+            position: 'absolute', bottom: 10, left: 10, right: 56, zIndex: 4,
+            display: 'flex', gap: 6, overflowX: 'auto',
+          }} className="oas-noscroll">
+            {[
+              { v: 'all',     l: 'すべて',     i: 'home' },
+              { v: 'food',    l: '食材',       i: 'leaf' },
+              { v: 'deli',    l: '惣菜・パン', i: 'flame' },
+              { v: 'liquor',  l: 'お酒・飲料', i: 'wine' },
+              { v: 'service', l: 'レジ・出口', i: 'pin' },
+            ].map((c) => {
+              const on = filter === c.v;
+              return (
+                <button key={c.v} onClick={() => setFilter(c.v)} style={{
+                  flex: '0 0 auto',
+                  background: on ? T.brand : '#fff',
+                  color: on ? '#fff' : T.inkMid,
+                  border: `1px solid ${on ? T.brand : T.outlineSoft}`,
+                  borderRadius: 99, padding: '6px 12px',
+                  fontFamily: SANS, fontWeight: 700, fontSize: 11,
+                  cursor: 'pointer', boxShadow: '0 2px 6px rgba(40,30,10,.06)',
+                  whiteSpace: 'nowrap',
+                }}>{c.l}</button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
