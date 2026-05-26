@@ -243,8 +243,41 @@ function SectionHead({ title, en, more, onMore, accent = T.orange, style }) {
   );
 }
 
-// ── Food illustration marks (simple, friendly) ───────────────────
+// ── Real photo URLs (loremflickr — tag-based, deterministic via lock seed)
+//    Fallback to the SVG illustration below if the image fails to load.
+const FOOD_IMG = {
+  chicken:  'https://loremflickr.com/240/240/chicken,raw,meat?lock=11',
+  egg:      'https://loremflickr.com/240/240/eggs,carton?lock=12',
+  salmon:   'https://loremflickr.com/240/240/salmon,fillet?lock=13',
+  cabbage:  'https://loremflickr.com/240/240/cabbage,green?lock=14',
+  rice:     'https://loremflickr.com/240/240/rice,bowl?lock=15',
+  onion:    'https://loremflickr.com/240/240/onion?lock=16',
+  tomato:   'https://loremflickr.com/240/240/tomato,red?lock=17',
+  tofu:     'https://loremflickr.com/240/240/tofu?lock=18',
+  milk:     'https://loremflickr.com/240/240/milk,carton?lock=19',
+  bread:    'https://loremflickr.com/240/240/bread,loaf?lock=20',
+  fish:     'https://loremflickr.com/240/240/sashimi,fish?lock=21',
+  apple:    'https://loremflickr.com/240/240/apple,red,fruit?lock=22',
+  banana:   'https://loremflickr.com/240/240/banana,yellow?lock=23',
+  natto:    'https://loremflickr.com/240/240/natto?lock=24',
+  noodle:   'https://loremflickr.com/240/240/ramen,bowl?lock=25',
+  sushi:    'https://loremflickr.com/240/240/sushi,nigiri?lock=26',
+  bento:    'https://loremflickr.com/240/240/bento,japanese?lock=27',
+  juice:    'https://loremflickr.com/240/240/juice,orange?lock=28',
+  yogurt:   'https://loremflickr.com/240/240/yogurt?lock=29',
+  pork:     'https://loremflickr.com/240/240/pork,raw,meat?lock=30',
+  beef:     'https://loremflickr.com/240/240/beef,raw,meat?lock=31',
+  cheese:   'https://loremflickr.com/240/240/cheese,block?lock=32',
+  misoSoup: 'https://loremflickr.com/240/240/miso,soup?lock=33',
+  oyakodon: 'https://loremflickr.com/240/240/donburi,japanese?lock=34',
+  nikujaga: 'https://loremflickr.com/240/240/japanese,stew,beef?lock=35',
+  salad:    'https://loremflickr.com/240/240/salad,vegetable?lock=36',
+};
+
+// ── Food mark — real photo with SVG illustration fallback ─────────
 function FoodMark({ kind, size = 80, bg }) {
+  const [failed, setFailed] = React.useState(false);
+  const imgSrc = FOOD_IMG[kind];
   const ink = T.ink;
   const sw = (s = 1.4) => ({ fill: 'none', stroke: ink, strokeWidth: s, strokeLinecap: 'round', strokeLinejoin: 'round' });
   const M = {
@@ -300,6 +333,20 @@ function FoodMark({ kind, size = 80, bg }) {
       <circle cx="36" cy="44" r="2" fill="#ffd34d"/>
     </g>,
   };
+  if (imgSrc && !failed) {
+    return (
+      <div style={{
+        width: size, height: size,
+        background: bg ?? T.paperAlt,
+        flex: '0 0 auto',
+        borderRadius: bg ? 8 : Math.max(6, size * 0.12),
+        overflow: 'hidden',
+      }}>
+        <img src={imgSrc} alt="" loading="lazy" onError={() => setFailed(true)}
+             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>
+      </div>
+    );
+  }
   return (
     <div style={{
       width: size, height: size,

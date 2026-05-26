@@ -406,12 +406,11 @@ function C_MyPage({ push }) {
           border: `1px solid ${T.outline}`,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{
-              width: 56, height: 56, borderRadius: 999,
-              background: `linear-gradient(135deg, ${T.orange}, ${T.orangeDeep})`, color: '#fff',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: SANS, fontWeight: 800, fontSize: 22, boxShadow: '0 4px 10px rgba(46,133,64,.3)',
-            }}>田</div>
+            <img src="https://i.pravatar.cc/120?img=49" alt="" style={{
+              width: 56, height: 56, borderRadius: 999, objectFit: 'cover',
+              boxShadow: '0 4px 10px rgba(46,133,64,.3)',
+              background: `linear-gradient(135deg, ${T.orange}, ${T.orangeDeep})`,
+            }}/>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 15, color: T.ink }}>田中 はるか 様</div>
               <div style={{ fontFamily: SANS, fontSize: 10.5, color: T.inkSoft, marginTop: 2 }}>会員番号 4901-2345-6789</div>

@@ -314,12 +314,10 @@ function C_Account({ pop }) {
           background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 12,
           padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16,
         }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: 999,
-            background: `linear-gradient(135deg, ${T.orange}, ${T.orangeDeep})`, color: '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: SANS, fontWeight: 800, fontSize: 18,
-          }}>田</div>
+          <img src="https://i.pravatar.cc/120?img=49" alt="" style={{
+            width: 48, height: 48, borderRadius: 999, objectFit: 'cover',
+            background: `linear-gradient(135deg, ${T.orange}, ${T.orangeDeep})`,
+          }}/>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 13, color: T.ink }}>会員番号</div>
             <div style={{ fontFamily: NUM, fontSize: 11, color: T.inkSoft, marginTop: 2 }}>4901-2345-6789</div>
