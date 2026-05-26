@@ -449,58 +449,93 @@ function C_AisleMap({ pop, push }) {
           background: '#fff', border: `1px solid ${T.outline}`, borderRadius: 14,
           height: '100%', padding: 14, position: 'relative', overflow: 'hidden',
         }}>
-          <svg viewBox="0 0 300 200" style={{ width: '100%', height: '100%' }}>
+          <svg viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet" style={{ width: '100%', height: '100%' }}>
+            <defs>
+              <pattern id="floorDots" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                <circle cx="5" cy="5" r=".6" fill={T.outline} opacity=".7"/>
+              </pattern>
+              <filter id="aisleShadow" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="1" stdDeviation=".8" floodOpacity=".06"/>
+              </filter>
+            </defs>
+
+            {/* Floor */}
+            <rect x="0" y="0" width="320" height="240" fill="url(#floorDots)"/>
+
             {/* Aisles */}
             {[
-              { x: 10,  y: 10,  w: 80,  h: 38, l: '青果', id: 0, c: T.freshSoft, ic: T.fresh },
-              { x: 96,  y: 10,  w: 80,  h: 38, l: '精肉', id: 1, c: T.saleSoft,  ic: T.sale },
-              { x: 182, y: 10,  w: 108, h: 38, l: '鮮魚', id: 3, c: '#cfe1ef',   ic: '#1f6ba8' },
-              { x: 10,  y: 58,  w: 60,  h: 76, l: '日配', id: 2, c: T.orangeSoft, ic: T.orange },
-              { x: 76,  y: 58,  w: 60,  h: 76, l: '冷蔵' },
-              { x: 142, y: 58,  w: 60,  h: 76, l: '冷凍' },
-              { x: 208, y: 58,  w: 82,  h: 36, l: '惣菜' },
-              { x: 208, y: 100, w: 82,  h: 34, l: 'ベーカリー' },
-              { x: 10,  y: 144, w: 130, h: 30, l: '酒類 · 飲料' },
-              { x: 146, y: 144, w: 96,  h: 30, l: 'レジ' },
-              { x: 248, y: 144, w: 42,  h: 30, l: '出口' },
+              { x: 10,  y: 18,  w: 96,  h: 44, l: '青果',       tint: '#e6f1d9', border: '#9bbd72', color: '#43652b' },
+              { x: 112, y: 18,  w: 96,  h: 44, l: '精肉',       tint: '#fadcde', border: '#d6868c', color: '#8a2a30' },
+              { x: 214, y: 18,  w: 96,  h: 44, l: '鮮魚',       tint: '#d5e6f2', border: '#7ba6c5', color: '#1f4a6b' },
+              { x: 10,  y: 70,  w: 70,  h: 80, l: '日配',       tint: '#fcebd2', border: '#d9a86a', color: '#7a5320' },
+              { x: 86,  y: 70,  w: 62,  h: 80, l: '冷蔵' },
+              { x: 154, y: 70,  w: 62,  h: 80, l: '冷凍' },
+              { x: 222, y: 70,  w: 88,  h: 38, l: '惣菜' },
+              { x: 222, y: 112, w: 88,  h: 38, l: 'ベーカリー' },
+              { x: 10,  y: 158, w: 140, h: 32, l: '酒類 · 飲料' },
+              { x: 156, y: 158, w: 92,  h: 32, l: 'レジ',       tint: '#f3eedd', border: '#c6a56c', color: '#5a4530', special: true },
+              { x: 254, y: 158, w: 56,  h: 32, l: '出口',       tint: '#fff', border: T.outline, color: T.inkMid, special: true },
             ].map((a, i) => {
               const isStep = steps.some(s => s.aisle === a.l);
               const stepIdx = steps.findIndex(s => s.aisle === a.l);
               const cur = stepIdx === step;
+              const fill = cur ? T.orange : (isStep ? a.tint : (a.tint || '#fafaf6'));
+              const stroke = cur ? T.orangeDeep : (isStep ? a.border : (a.border || T.outlineSoft));
+              const textColor = cur ? '#fff' : (isStep ? a.color : (a.color || T.inkSoft));
               return (
-                <g key={i}>
-                  <rect x={a.x} y={a.y} width={a.w} height={a.h}
-                        fill={cur ? T.orange : (isStep ? (a.c || T.paperAlt) : '#fff')}
-                        stroke={cur ? T.orangeDeep : T.outline}
-                        strokeWidth={cur ? 2 : 1}/>
-                  <text x={a.x + a.w/2} y={a.y + a.h/2 + 4} textAnchor="middle"
-                        fontFamily={SANS} fontWeight="800"
-                        fontSize={a.l.length > 4 ? 9 : 11}
-                        fill={cur ? '#fff' : (a.ic || T.ink)}>{a.l}</text>
-                  {isStep && !cur && (
-                    <circle cx={a.x + a.w - 6} cy={a.y + 6} r="6" fill={T.ink}>
-                      <title>{stepIdx + 1}</title>
-                    </circle>
-                  )}
-                  {isStep && !cur && (
-                    <text x={a.x + a.w - 6} y={a.y + 9} textAnchor="middle"
-                          fontFamily={NUM} fontWeight="900" fontSize="8" fill="#fff">{stepIdx + 1}</text>
+                <g key={i} filter="url(#aisleShadow)">
+                  <rect x={a.x} y={a.y} width={a.w} height={a.h} rx="4" ry="4"
+                        fill={fill} stroke={stroke}
+                        strokeWidth={cur ? 1.8 : 1}/>
+                  <text x={a.x + a.w/2} y={a.y + a.h/2 + 3.5} textAnchor="middle"
+                        fontFamily={SANS}
+                        fontWeight={cur || isStep ? 800 : 700}
+                        fontSize={a.l.length >= 5 ? 9 : 11.5}
+                        letterSpacing=".04em"
+                        fill={textColor}>{a.l}</text>
+                  {isStep && (
+                    <g transform={`translate(${a.x + a.w - 11},${a.y + 11})`}>
+                      <circle r="9" fill={cur ? '#fff' : T.brand} stroke={cur ? T.brand : 'none'} strokeWidth="1.5"/>
+                      <text textAnchor="middle" y="3.5"
+                            fontFamily={NUM} fontWeight="900" fontSize="11"
+                            fill={cur ? T.brand : '#fff'}>{stepIdx + 1}</text>
+                    </g>
                   )}
                 </g>
               );
             })}
-            {/* Path */}
-            <path d="M40 175 L40 76 L41 76 L41 30 L130 30 L130 76 L40 76 L40 96 L182 96 L240 30"
-              stroke={T.orange} strokeWidth="2.2" strokeDasharray="5 3" fill="none" strokeLinecap="round"/>
-            {/* You marker */}
-            <g transform="translate(40 175)">
-              <circle r="6" fill={T.fresh}/>
-              <circle r="11" fill={T.fresh} opacity=".25"/>
+
+            {/* Path — entrance → 青果 → 精肉 → 鮮魚 → (back to) 日配 (current) */}
+            <path d="
+              M 50 222
+              L 50 200
+              L 50 64
+              L 50 40
+              L 160 40
+              L 262 40
+              L 262 62
+              L 262 130
+              L 220 130
+              L 80 130
+              L 50 130
+              L 45 100
+            "
+            stroke={T.orange} strokeWidth="2.4" strokeDasharray="5 4" fill="none"
+            strokeLinecap="round" strokeLinejoin="round" opacity=".85"/>
+
+            {/* Entry label */}
+            <g transform="translate(50, 222)">
+              <circle r="15" fill={T.fresh} opacity=".15"/>
+              <circle r="7" fill={T.fresh} stroke="#fff" strokeWidth="2"/>
+              <circle r="3" fill="#fff"/>
+              <text x="20" y="3" fontFamily={SANS} fontWeight="700" fontSize="9" fill={T.fresh}>入口</text>
             </g>
-            {/* Target */}
-            <g transform="translate(130 30)">
-              <path d="M0 -10c-6 0-9 5-9 8c0 5 9 12 9 12s9-7 9-12c0-3-3-8-9-8z" fill={T.sale}/>
-              <circle cy="-2" r="2.5" fill="#fff"/>
+
+            {/* Target pin on current step */}
+            <g transform="translate(45, 100)">
+              <ellipse cx="0" cy="14" rx="6" ry="2" fill={T.ink} opacity=".15"/>
+              <path d="M0 -16c-8 0-13 6-13 11c0 7 13 17 13 17s13-10 13-17c0-5-5-11-13-11z" fill={T.sale}/>
+              <circle cy="-4" r="4" fill="#fff"/>
             </g>
           </svg>
         </div>
