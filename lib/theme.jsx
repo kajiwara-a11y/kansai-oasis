@@ -342,7 +342,7 @@ function FoodMark({ kind, size = 80, bg }) {
         borderRadius: bg ? 8 : Math.max(6, size * 0.12),
         overflow: 'hidden',
       }}>
-        <img src={imgSrc} alt="" loading="lazy" onError={() => setFailed(true)}
+        <img src={imgSrc} alt="" onError={() => setFailed(true)}
              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>
       </div>
     );
