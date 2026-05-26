@@ -20,35 +20,11 @@
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
   }
-  .proto-info {
-    position: fixed; left: 20px; bottom: 20px; z-index: 10;
-    color: rgba(255,255,255,.6);
-    font-size: 11px; letter-spacing: .12em;
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  .proto-info b { color: rgba(255,255,255,.9); font-weight: 700; }
-  .proto-resetbtn {
-    position: fixed; top: 20px; right: 20px; z-index: 10;
-    background: rgba(255,255,255,.08); color: rgba(255,255,255,.7);
-    border: 1px solid rgba(255,255,255,.1);
-    padding: 8px 14px; border-radius: 999px;
-    font-size: 11px; font-weight: 700; letter-spacing: .08em;
-    cursor: pointer; backdrop-filter: blur(8px);
-    font-family: inherit;
-  }
-  .proto-resetbtn:hover { background: rgba(255,255,255,.16); color: #fff; }
 </style>
 </head>
 <body>
 <div class="proto-bg"></div>
 <div id="root"></div>
-
-<button class="proto-resetbtn" onclick="window.__resetProto && window.__resetProto()">ホームへ戻る ⟲</button>
-
-<div class="proto-info">
-  <b>阪急OASIS · AI 先導型</b>
-  <span>すべてのボタンが動作します — タブ・カード・アイコンを操作してください</span>
-</div>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
@@ -65,7 +41,6 @@
 
 <script type="text/babel">
 function Prototype() {
-  const [resetKey, setResetKey] = React.useState(0);
   const [scale, setScale] = React.useState(1);
 
   React.useEffect(() => {
@@ -77,14 +52,13 @@ function Prototype() {
     };
     fit();
     window.addEventListener('resize', fit);
-    window.__resetProto = () => setResetKey(k => k + 1);
     return () => window.removeEventListener('resize', fit);
   }, []);
 
   return (
     <div className="proto-stage">
       <div style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}>
-        <MobileC key={resetKey} start="home"/>
+        <MobileC start="home"/>
       </div>
     </div>
   );
