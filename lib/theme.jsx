@@ -243,35 +243,38 @@ function SectionHead({ title, en, more, onMore, accent = T.orange, style }) {
   );
 }
 
-// ── Real photo URLs (loremflickr — tag-based, deterministic via lock seed)
-//    Fallback to the SVG illustration below if the image fails to load.
+// ── Real photo URLs from TheMealDB.
+//    Ingredients are clean white-background PNGs (consistent style).
+//    Dishes use meal photos from the Japanese-area catalog.
+//    Kinds without a good photo match fall back to the SVG illustration.
+const _MDB_I = 'https://www.themealdb.com/images/ingredients/';
+const _MDB_M = 'https://www.themealdb.com/images/media/meals/';
 const FOOD_IMG = {
-  chicken:  'https://loremflickr.com/240/240/chicken,raw,meat?lock=11',
-  egg:      'https://loremflickr.com/240/240/eggs,carton?lock=12',
-  salmon:   'https://loremflickr.com/240/240/salmon,fillet?lock=13',
-  cabbage:  'https://loremflickr.com/240/240/cabbage,green?lock=14',
-  rice:     'https://loremflickr.com/240/240/rice,bowl?lock=15',
-  onion:    'https://loremflickr.com/240/240/onion?lock=16',
-  tomato:   'https://loremflickr.com/240/240/tomato,red?lock=17',
-  tofu:     'https://loremflickr.com/240/240/tofu?lock=18',
-  milk:     'https://loremflickr.com/240/240/milk,carton?lock=19',
-  bread:    'https://loremflickr.com/240/240/bread,loaf?lock=20',
-  fish:     'https://loremflickr.com/240/240/sashimi,fish?lock=21',
-  apple:    'https://loremflickr.com/240/240/apple,red,fruit?lock=22',
-  banana:   'https://loremflickr.com/240/240/banana,yellow?lock=23',
-  natto:    'https://loremflickr.com/240/240/natto?lock=24',
-  noodle:   'https://loremflickr.com/240/240/ramen,bowl?lock=25',
-  sushi:    'https://loremflickr.com/240/240/sushi,nigiri?lock=26',
-  bento:    'https://loremflickr.com/240/240/bento,japanese?lock=27',
-  juice:    'https://loremflickr.com/240/240/juice,orange?lock=28',
-  yogurt:   'https://loremflickr.com/240/240/yogurt?lock=29',
-  pork:     'https://loremflickr.com/240/240/pork,raw,meat?lock=30',
-  beef:     'https://loremflickr.com/240/240/beef,raw,meat?lock=31',
-  cheese:   'https://loremflickr.com/240/240/cheese,block?lock=32',
-  misoSoup: 'https://loremflickr.com/240/240/miso,soup?lock=33',
-  oyakodon: 'https://loremflickr.com/240/240/donburi,japanese?lock=34',
-  nikujaga: 'https://loremflickr.com/240/240/japanese,stew,beef?lock=35',
-  salad:    'https://loremflickr.com/240/240/salad,vegetable?lock=36',
+  chicken:  _MDB_I + 'Chicken.png',
+  egg:      _MDB_I + 'Eggs.png',
+  salmon:   _MDB_I + 'Salmon.png',
+  cabbage:  _MDB_I + 'Cabbage.png',
+  rice:     _MDB_I + 'Rice.png',
+  onion:    _MDB_I + 'Onions.png',
+  tomato:   _MDB_I + 'Tomatoes.png',
+  tofu:     _MDB_I + 'Tofu.png',
+  milk:     _MDB_I + 'Milk.png',
+  bread:    _MDB_I + 'Bread.png',
+  fish:     _MDB_I + 'Fish.png',
+  apple:    _MDB_I + 'Apples.png',
+  banana:   _MDB_I + 'Banana.png',
+  noodle:   _MDB_I + 'Noodles.png',
+  pork:     _MDB_I + 'Pork.png',
+  beef:     _MDB_I + 'Beef.png',
+  cheese:   _MDB_I + 'Cheese.png',
+  yogurt:   _MDB_I + 'Yogurt.png',
+  sushi:    _MDB_M + 'g046bb1663960946.jpg',
+  oyakodon: _MDB_M + 'd8f6qx1604182128.jpg',  // Katsudon — same donburi style
+  nikujaga: _MDB_M + 'uyqrrv1511553350.jpg',  // Beef stew
+  bento:    _MDB_M + 'kw92t41604181871.jpg',  // Japanese gohan rice bowl
+  misoSoup: _MDB_M + '1529446137.jpg',         // Egg drop soup
+  salad:    _MDB_M + 'zry07j1763779321.jpg',  // Noodle bowl salad
+  // natto, juice → SVG fallback (no good match in catalog)
 };
 
 // ── Food mark — real photo with SVG illustration fallback ─────────
